@@ -4,4 +4,4 @@ bin/**
 out/
 .recommenders/
 .class
-\.spyproject/
+.spyproject/
