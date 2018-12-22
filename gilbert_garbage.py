@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 """
 Created on Wed Dec 12 15:02:51 2018
 
@@ -9,5 +9,5 @@ import tensorflow as tf
 a = tf.constant(2.0)
 b = tf.constant(3.0)
 c = a * b
-
+print(c)
 #test123
