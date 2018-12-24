@@ -79,6 +79,7 @@ class COCO:
         self.imgs = imgs
         self.cats = cats
 
+
     def info(self):
         """
         Print information about the annotation file.
