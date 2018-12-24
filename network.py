@@ -5,7 +5,7 @@ Created on Wed Dec 12 14:47:15 2018
 @author: plagl
 """
 
-# Import `tensorflow`
+# Import modules
 import tensorflow as tf
 
 # Initialize two constants
@@ -26,3 +26,25 @@ print(sess.run(result))
 
 # Close the session
 sess.close()
+
+
+
+class CNN:
+    def __init__(self, train_data, val_data, test_data, params):
+        pass
+    
+    
+    def train(self):
+        pass
+    
+    
+    def validate(self):
+        pass
+    
+    
+    def test(self):
+        pass
+    
+    
+    def predict(self):
+        pass

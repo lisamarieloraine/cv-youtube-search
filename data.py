@@ -12,13 +12,6 @@ import tensorflow as tf
 
 class Data:
     def __init__(self, annotation_dir, image_dir):
-        """
-        Modified version of the COCO API.
-        Constructor of Microsoft COCO helper class for reading and visualizing annotations.
-        :param annotation_file (str): location of annotation file
-        :param image_folder (str): location to the folder that hosts images.
-        :return:
-        """
         
         self.ann_dir = annotation_dir
         self.img_dir = image_dir
@@ -42,30 +35,17 @@ class Data:
         return info
     
     
-    def load_labels(self, anns):
+    def load_labels(self, anns): # ---------------- not in use anymore!!!
+        print('creating labels...')
         labels = dict()
         for a in anns:
-            labels[a.get('image_id')] = a.get('category_id')
-            
+            labels[a.get('image_id')] = a.get('category_id')   
         return labels
-        
-        
-        
-    def load_images(self, info):
-        # loads all images - WIP    
-        images = dict()
-        os.chdir( self.img_dir )
-        
-        for i in info:
-            images[i.get('id')] = tf.image.decode_jpeg(i.get('file_name'), channels=1)
-                
-        return images
-    
-    
-    def convert_labels(self, labels):
-        apple = 53
-        banana = 52
-        broccoli = 54
+            
+    def convert_labels_old(self, labels): # ---------------- not in use anymore!!!
+        apple = self.API.getCatIds(catNms=['apple'])[0]
+        banana = self.API.getCatIds(catNms=['banana'])[0]
+        broccoli = self.API.getCatIds(catNms=['broccoli'])[0]
         
         (other, apples, bananas, broccolis) = (0,1,2,3)
         counts = [0,0,0,0]
@@ -84,7 +64,76 @@ class Data:
                 labels[key] = other
                 counts[other] += 1
                 
+        # Save to json file
+        with open('classes.json', 'w') as fp:
+            json.dump(labels, fp)
+        print('saved labels to json file!')       
         return labels, counts
+    
+    
+    def convert_labels(self, anns):
+        apple = self.API.getCatIds(catNms=['apple'])[0]
+        banana = self.API.getCatIds(catNms=['banana'])[0]
+        broccoli = self.API.getCatIds(catNms=['broccoli'])[0]
+        
+        (other, apples, bananas, broccolis) = (0,1,2,3)
+        counts = [0,0,0,0]
+        
+        for a in anns:
+            if a.get('category_id') == apple:
+                a['category_id'] = apples
+                counts[apples] += 1
+            elif a.get('category_id') == banana:
+                a['category_id'] = bananas
+                counts[bananas] += 1
+            elif a.get('category_id') == broccoli:
+                a['category_id'] = broccolis
+                counts[broccolis] += 1
+            else:
+                a['category_id'] = other
+                counts[other] += 1
+                
+        # Save to json file
+        with open('annotations.json', 'w') as fp:
+            json.dump(anns, fp)
+        print('saved annotations to json file!')       
+        return anns, counts
+    
+    
+    def load_images(self, info): # ---------------- not in use anymore!!!
+        # converts images to tensors
+        print('converting images to tensors...')
+        images = dict()
+        os.chdir( self.img_dir )
+        
+        for i in info:
+            images[i.get('id')] = tf.image.decode_jpeg(i.get('file_name'), channels=1)
+        return images
+    
+    
+    def create_dataset(self, output_file, info, anns):        
+        # Reads an image from a file, decodes it into a dense tensor, and resizes it
+        # to a fixed shape.
+        def _parse_function(filename, label):
+          image_string = tf.read_file(filename)
+          image_decoded = tf.image.decode_jpeg(image_string)
+          image_resized = tf.image.resize_images(image_decoded, [28, 28])
+          return image_resized, label
+        
+        print('creating TFRecord file...')
+        
+        # A vector of filenames.
+        filenames = tf.constant([f.get('file_name') for f in info])
+        
+        # `labels[i]` is the label for the image in `filenames[i].
+        labels = tf.constant([f.get('category_id') for f in anns])
+        
+        #filenames_placeholder = tf.placeholder(filenames.dtype, filenames.shape)
+        #labels_placeholder = tf.placeholder(labels.dtype, labels.shape)
+        
+        dataset = tf.data.Dataset.from_tensor_slices((filenames, labels))
+        dataset = dataset.map(_parse_function)
+        return dataset
             
         
 # Create some variables.
@@ -93,15 +142,11 @@ img_path = "D:\\cocoapi\\images\\"
 data = Data(ann_path, img_path)
 anns = data.get_annotations()
 info = data.get_info(anns)
-
 lbl = data.load_labels(anns)
+classes, counts = data.convert_labels(anns)
+dataset = data.create_dataset("dataset", info, classes)
 # img = data.load_images(info)
-classes, counts = data.convert_labels(lbl)
 
-# Save cats to json
-with open('classes.json', 'w') as fp:
-    json.dump(classes, fp)
-            
             
             
             

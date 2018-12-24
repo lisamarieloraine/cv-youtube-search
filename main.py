@@ -38,16 +38,11 @@ img_path = "D:\\cocoapi\\images\\"
 data = Data(ann_path, img_path)
 anns = data.get_annotations()
 info = data.get_info(anns)
-
-img, lbl = data.load_images(info, anns)
+lbl = data.load_labels(anns)
 classes, counts = data.convert_labels(lbl)
-print(classes)
-print('\n')
-print(counts)
+# img = data.load_images(info)
 
-# Save cats to json
-with open('classes.json', 'w') as fp:
-    json.dump(classes, fp)
+
 
 # Add an op to initialize the variables.
 init_op = tf.global_variables_initializer()
