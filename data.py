@@ -72,11 +72,11 @@ class Data:
     
     
     def convert_labels(self, anns):
+        print('converting labels...') 
         apple = self.API.getCatIds(catNms=['apple'])[0]
         banana = self.API.getCatIds(catNms=['banana'])[0]
         broccoli = self.API.getCatIds(catNms=['broccoli'])[0]
-        
-        (other, apples, bananas, broccolis) = (0,1,2,3)
+        (other, apples, bananas, broccolis) = (-1,0,1,2)
         counts = [0,0,0,0]
         
         for a in anns:
@@ -105,13 +105,12 @@ class Data:
         print('converting images to tensors...')
         images = dict()
         os.chdir( self.img_dir )
-        
         for i in info:
             images[i.get('id')] = tf.image.decode_jpeg(i.get('file_name'), channels=1)
         return images
     
     
-    def create_dataset(self, output_file, info, anns):        
+    def create_dataset(self, info, anns):        
         # Reads an image from a file, decodes it into a dense tensor, and resizes it
         # to a fixed shape.
         def _parse_function(filename, label):
@@ -120,19 +119,22 @@ class Data:
           image_resized = tf.image.resize_images(image_decoded, [28, 28])
           return image_resized, label
         
-        print('creating TFRecord file...')
-        
+        print('creating dataset...')
         # A vector of filenames.
         filenames = tf.constant([f.get('file_name') for f in info])
-        
         # `labels[i]` is the label for the image in `filenames[i].
         labels = tf.constant([f.get('category_id') for f in anns])
         
+        # Apply one-hot encoding to labels
+        labels = tf.one_hot(labels, depth=3)
+        
+        #might improve efficiency for large datasets
         #filenames_placeholder = tf.placeholder(filenames.dtype, filenames.shape)
         #labels_placeholder = tf.placeholder(labels.dtype, labels.shape)
         
         dataset = tf.data.Dataset.from_tensor_slices((filenames, labels))
         dataset = dataset.map(_parse_function)
+        print('dataset created!')
         return dataset
             
         
@@ -142,9 +144,9 @@ img_path = "D:\\cocoapi\\images\\"
 data = Data(ann_path, img_path)
 anns = data.get_annotations()
 info = data.get_info(anns)
-lbl = data.load_labels(anns)
 classes, counts = data.convert_labels(anns)
-dataset = data.create_dataset("dataset", info, classes)
+#classes = json.loads(open('annotations.json').read())
+dataset = data.create_dataset(info, classes)
 # img = data.load_images(info)
 
             
