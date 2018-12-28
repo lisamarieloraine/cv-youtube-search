@@ -11,8 +11,8 @@ def import_youtube_data(_youtube_url):
     result = list()
     response = get_verified_response(_youtube_url)  # Get server response from url request
     soup = BeautifulSoup(response.data, 'html.parser')
-    for vid in soup.findAll(attrs={'class': 'yt-uix-tile-link'}):
-        result.append('https://www.youtube.com' + vid['href'])
+    for vid in soup.findAll('a', attrs={'class': 'yt-uix-tile-link'}):  # Find all <a> tags on page
+        result.append('https://www.youtube.com' + vid['href'])  # Extracting web links using 'href' property
     return result
 
 
@@ -23,12 +23,13 @@ def search_and_store(_search_term, _filename):
     """Returns list of search results while storing them in json"""
     print('Scraping Youtube data')
     # epoch_time = int(round(time.time() * 1000))
-    youtube_url = f'https://www.youtube.com/results?search_query={_search_term}'
+    formatted_search_term = _search_term.replace(" ", "+")  # Format search term with spaces
+    youtube_url = f'https://www.youtube.com/results?search_query={formatted_search_term}'
     return import_youtube_data(youtube_url)
 
 
 if __name__ == '__main__':
-    _list = search_and_store('qtpie', 'unused')
+    _list = search_and_store('what to do when bored', 'unused')
     print('--- Update data func ---')
     for link in _list:
         print(link)
