@@ -15,7 +15,6 @@ def filter_watch_only(_list):
     return result
 
 
-# TODO: Filter on only watchable videos (no user links)
 # @Description Lists youtube response videos from given url
 # @argument <class 'string'>
 # @return <class 'list'>
