@@ -3,6 +3,7 @@
 
 from lxml import html
 import xml.etree.ElementTree as ET
+import json
 
 
 # @argument <class 'bytes'>
@@ -17,6 +18,11 @@ def response_to_html(_response_data):
 def response_to_xml(_response_data):
     """Returns xml from url response"""
     return ET.fromstring(_response_data)
+
+
+def response_to_json(_response_data):
+    """Returns json from url response"""
+    return json.loads(_response_data)
 
 
 # @argument <class 'lxml.html.HtmlElement'>
