@@ -1,28 +1,36 @@
 from Scripts.WebScraping.VerifyRequest import get_verified_response
-from Scripts.WebScraping.HTMLConversion import response_to_xml
-import time
+from bs4 import BeautifulSoup
 
 
-# @Description Scrapes youtube video data from given url
+# TODO: Filter on only watchable videos (no user links)
+# @Description Lists youtube response videos from given url
 # @argument <class 'string'>
-# @return <class ''>
+# @return <class 'list'>
 def import_youtube_data(_youtube_url):
-    """Returns object with values read from url response"""
+    """Returns list of urls from url response"""
+    result = list()
     response = get_verified_response(_youtube_url)  # Get server response from url request
-    xml_element = response_to_xml(response.data)  # Convert response data to xml element
-    # return stats_obj
+    soup = BeautifulSoup(response.data, 'html.parser')
+    for vid in soup.findAll(attrs={'class': 'yt-uix-tile-link'}):
+        result.append('https://www.youtube.com' + vid['href'])
+    return result
 
 
 # @Description Higher order function to scrape and store data
 # @argument <class 'string'> and <class 'string'>
-# @return <class ''>
-def update_data(_filename):
-    """Returns object"""
+# @return <class 'list'>
+def search_and_store(_search_term, _filename):
+    """Returns list of search results while storing them in json"""
     print('Scraping Youtube data')
-    epoch_time = int(round(time.time() * 1000))
+    # epoch_time = int(round(time.time() * 1000))
+    youtube_url = f'https://www.youtube.com/results?search_query={_search_term}'
+    return import_youtube_data(youtube_url)
 
-    youtube_url = f'{epoch_time}'
 
-    import_youtube_data(youtube_url)
-    # return stats_obj
+if __name__ == '__main__':
+    _list = search_and_store('qtpie', 'unused')
+    print('--- Update data func ---')
+    for link in _list:
+        print(link)
 
+    # search_query = f'https://www.youtube.com/results?search_query=banana&pbj=1'
