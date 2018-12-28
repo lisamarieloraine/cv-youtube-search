@@ -1,5 +1,18 @@
 from Scripts.WebScraping.VerifyRequest import get_verified_response
 from bs4 import BeautifulSoup
+from re import compile
+
+
+# @Description Filters hyper-links using regex pattern matching
+# @argument <class 'list'>
+# @return <class 'list'>
+def filter_watch_only(_list):
+    result = list()
+    pattern = compile('^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/watch.+$')
+    for href in _list:
+        if pattern.match(href):
+            result.append(href)
+    return result
 
 
 # TODO: Filter on only watchable videos (no user links)
@@ -13,7 +26,7 @@ def import_youtube_data(_youtube_url):
     soup = BeautifulSoup(response.data, 'html.parser')
     for vid in soup.findAll('a', attrs={'class': 'yt-uix-tile-link'}):  # Find all <a> tags on page
         result.append('https://www.youtube.com' + vid['href'])  # Extracting web links using 'href' property
-    return result
+    return filter_watch_only(result)
 
 
 # @Description Higher order function to scrape and store data
@@ -29,9 +42,10 @@ def search_and_store(_search_term, _filename):
 
 
 if __name__ == '__main__':
-    _list = search_and_store('what to do when bored', 'unused')
-    print('--- Update data func ---')
+    _list = search_and_store('qtpie', 'unused')
+    print('--- Search function ---')
     for link in _list:
         print(link)
+    print(len(_list))
 
     # search_query = f'https://www.youtube.com/results?search_query=banana&pbj=1'
