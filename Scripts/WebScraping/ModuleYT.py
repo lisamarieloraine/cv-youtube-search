@@ -7,6 +7,7 @@ from re import compile
 # @argument <class 'list'>
 # @return <class 'list'>
 def filter_watch_only(_list):
+    """Returns list of filtered youtube hyper-links"""
     result = list()
     pattern = compile('^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/watch.+$')
     for href in _list:
