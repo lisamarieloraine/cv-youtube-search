@@ -122,7 +122,8 @@ class CNN:
         return cost, optimizer, accuracy
     
     
-    def train(self, train_X, train_y):
+    def train(self, train_X, train_y, test_X, test_y):
+        print("training the network...")
         # Initializing the variables and operations
         init = tf.global_variables_initializer()
         cost, optimizer, accuracy = self.operations()
@@ -148,7 +149,7 @@ class CNN:
                 print("Optimization Finished!")
                 
         # Calculate accuracy for all test images
-        test_acc,valid_loss = sess.run([accuracy,cost], feed_dict={x: test_X,y : test_y})
+        test_acc,valid_loss = sess.run([accuracy,cost], feed_dict={x: test_X, y: test_y})
         train_loss.append(loss)
         test_loss.append(valid_loss)
         train_accuracy.append(acc)
@@ -158,14 +159,4 @@ class CNN:
         summary_writer.close()
         return train_loss, train_accuracy, test_loss, test_accuracy
     
-
-
-
-training_iters = 200 
-learning_rate = 0.001 
-batch_size = 128
-# MNIST data input (img shape: 28*28)
-n_input = 28
-# MNIST total classes (0-9 digits)
-n_classes = 3
 

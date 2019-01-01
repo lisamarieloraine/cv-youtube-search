@@ -11,7 +11,7 @@ import json
 import tensorflow as tf
 
 class Data:
-    def __init__(self, annotation_dir, image_dir):
+    def __init__(self, annotation_dir, annotation_name, image_dir):
         
         self.ann_dir = annotation_dir
         self.img_dir = image_dir
@@ -20,7 +20,7 @@ class Data:
         os.chdir( self.ann_dir )
         retval = os.getcwd()
         print("Directory changed successfully:", retval)
-        self.API = coco.COCO("instances_train2017.json")
+        self.API = coco.COCO(annotation_name)
         
         
     def get_annotations(self, crowds=0):
@@ -120,12 +120,15 @@ class Data:
           return image_resized, label
         
         print('creating dataset...')
+        os.chdir( self.img_dir )
         # A vector of filenames.
         filenames = tf.constant([f.get('file_name') for f in info])
         # `labels[i]` is the label for the image in `filenames[i].
         labels = tf.constant([f.get('category_id') for f in anns])
         
         # Apply one-hot encoding to labels
+        # This converts the integer labels to a vector of 0s with a 1 for the 
+        # category that the object belongs to
         labels = tf.one_hot(labels, depth=3)
         
         #might improve efficiency for large datasets
@@ -137,17 +140,6 @@ class Data:
         print('dataset created!')
         return dataset
             
-        
-# Create some variables.
-ann_path = "D:\\cocoapi\\annotations\\"
-img_path = "D:\\cocoapi\\images\\"
-data = Data(ann_path, img_path)
-anns = data.get_annotations()
-info = data.get_info(anns)
-classes, counts = data.convert_labels(anns)
-#classes = json.loads(open('annotations.json').read())
-dataset = data.create_dataset(info, classes)
-# img = data.load_images(info)
 
             
             
