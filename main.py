@@ -41,8 +41,8 @@ network = CNN(training_iters, learning_rate, batch_size, n_input, n_classes, img
 # Train the network using the training data
 tf.reset_default_graph() 
 train_loss, train_accuracy, val_loss, val_accuracy = network.train(info_train, classes_train, info_val, classes_val)
-#network.plot_loss(train_loss, test_loss)
-#network.plot_accuracy(train_accuracy, test_accuracy)
+#network.plot_loss(train_loss, val_loss)
+#network.plot_accuracy(train_accuracy, val_accuracy)
 
 
 

@@ -113,7 +113,7 @@ class CNN:
     
     
     def operations(self, x, y):
-        pred = self.conv_net(x, self.weights, self.biases)
+        pred = self.conv_net(x)
         cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
         optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(cost)
     
