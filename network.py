@@ -164,7 +164,8 @@ class CNN:
         iterator = tf.data.Iterator.from_structure(train_dataset.output_types, train_dataset.output_shapes)
         data_X, data_y = iterator.get_next()
         data_y = tf.cast(data_y, tf.int32)
-        data_y = tf.one_hot(data_y, depth = self.n_classes)
+        #data_y = tf.one_hot(data_y, depth = self.n_classes)
+        optimizer, accuracy, cost = self.operations(data_X, data_y)
         
         # Initialize with required Datasets
         train_iterator = iterator.make_initializer(train_dataset)
@@ -172,7 +173,6 @@ class CNN:
         
         # Initializing the variables and operations
         init = tf.global_variables_initializer()
-        optimizer, accuracy, cost = self.operations(data_X, data_y)
         
         with tf.Session() as sess:
             sess.run(init) 
@@ -188,7 +188,7 @@ class CNN:
                 sess.run(train_iterator)
                 try:
                     while True:
-                        _, acc, loss = sess.run([optimizer, accuracy, cost])
+                        opt, acc, loss = sess.run([optimizer, accuracy, cost])
                         train_loss += loss
                         train_accuracy += acc
                 except tf.errors.OutOfRangeError:
