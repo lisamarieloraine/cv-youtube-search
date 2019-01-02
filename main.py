@@ -8,6 +8,7 @@ Created on Sun Dec 23 16:05:26 2018
 # Import libraries
 from data import Data
 from network import CNN
+import tensorflow as tf
 
 
 # Prepare training dataset
@@ -38,6 +39,7 @@ n_classes = 3
 network = CNN(training_iters, learning_rate, batch_size, n_input, n_classes, img_path_train, img_path_val)
 
 # Train the network using the training data
+tf.reset_default_graph() 
 train_loss, train_accuracy, val_loss, val_accuracy = network.train(info_train, classes_train, info_val, classes_val)
 #network.plot_loss(train_loss, test_loss)
 #network.plot_accuracy(train_accuracy, test_accuracy)

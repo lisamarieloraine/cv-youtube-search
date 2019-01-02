@@ -85,9 +85,9 @@ class CNN:
         return tf.nn.max_pool(x, ksize=[1, k, k, 1], strides=[1, k, k, 1],padding='SAME')
     
     
-    def conv_net(self):  
+    def conv_net(self, x):  
         # here we call the conv2d function we had defined above and pass the input image x, weights wc1 and bias bc1.
-        conv1 = self.conv2d(self.image, self.weights['wc1'], self.biases['bc1'])
+        conv1 = self.conv2d(x, self.weights['wc1'], self.biases['bc1'])
         # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 14*14 matrix.
         conv1 = self.maxpool2d(conv1, k=2)
     
@@ -129,6 +129,7 @@ class CNN:
         # implements a reinitializable iterator
         # see https://medium.com/ymedialabs-innovation/how-to-use-dataset-and-iterators-in-tensorflow-with-code-samples-3bb98b6b74ab
         print("training the network...")
+        tf.reset_default_graph() 
         
         # Reads an image from a file, decodes it into a dense tensor, and resizes it
         # to a fixed shape.
@@ -137,7 +138,7 @@ class CNN:
           image_decoded = tf.image.decode_jpeg(image_string)
           image_resized = tf.image.resize_images(image_decoded, [28, 28])
           return image_resized, label
-      
+       #ValueError: Shape must be rank 0 but is rank 1 for 'ReadFile' (op: 'ReadFile') with input shapes: [?].
         print('creating datasets...')
         # A vector of filenames.
         filenames_train = tf.constant([f.get('file_name') for f in info_train])
@@ -153,10 +154,10 @@ class CNN:
         # Create separate Datasets for training and validation
         os.chdir( self.img_dir_train )
         train_dataset = tf.data.Dataset.from_tensor_slices((placeholder_X, placeholder_y))
-        train_dataset = train_dataset.batch(self.batch_size).map(_parse_function)
+        train_dataset = train_dataset.map(_parse_function).batch(self.batch_size)
         os.chdir( self.img_dir_val )
         val_dataset = tf.data.Dataset.from_tensor_slices((placeholder_X, placeholder_y))
-        val_dataset = val_dataset.batch(self.batch_size).map(_parse_function)
+        val_dataset = val_dataset.map(_parse_function).batch(self.batch_size)
         print('datasets created!')
         
         # Iterator has to have same output types across all Datasets to be used
