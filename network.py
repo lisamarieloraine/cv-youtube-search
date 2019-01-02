@@ -14,33 +14,35 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0" #for training on gpu
 
 
 class CNN:
-    def __init__(self, epochs, alpha, batch_size, n_inputs, n_classes):
-        self.training_iters = epochs
+    def __init__(self, epochs, alpha, batch_size, n_inputs, n_classes, img_dir_train, img_dir_val):
+        self.epochs = epochs
         self.learning_rate = alpha
         self.batch_size = batch_size
         # input data shape (img shape: 28*28)
         self.n_input = n_inputs
         # total classes (0-3 digits)
         self.n_classes = n_classes
+        self.img_dir_train = img_dir_train
+        self.img_dir_val = img_dir_val
 
-        #both placeholders are of type float
-        self.image = tf.placeholder("float", [None, n_inputs,n_inputs,1])
-        self.labels = tf.placeholder("float", [None, n_classes])
+        #placeholders for images and labels
+        #self.placeholder_X = tf.placeholder(tf.float32, [None, n_inputs, n_inputs, 1])
+        #self.placeholder_y = tf.placeholder(tf.int32, [None])
         
         #set up dictionaries for the structure of the weight and bias terms
         self.weights = {
-        'wc1': tf.get_variable('W0', shape=(3,3,1,32), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc2': tf.get_variable('W1', shape=(3,3,32,64), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc3': tf.get_variable('W2', shape=(3,3,64,128), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wd1': tf.get_variable('W3', shape=(4*4*128,128), initializer=tf.contrib.layers.xavier_initializer()), 
-        'out': tf.get_variable('W6', shape=(128,n_classes), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc1': tf.get_variable('w0', shape=(3,3,1,32), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc2': tf.get_variable('w1', shape=(3,3,32,64), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc3': tf.get_variable('w2', shape=(3,3,64,128), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wd1': tf.get_variable('w3', shape=(4*4*128,128), initializer=tf.contrib.layers.xavier_initializer()), 
+        'out': tf.get_variable('w6', shape=(128,n_classes), initializer=tf.contrib.layers.xavier_initializer()), 
         }
         self.biases = {
-            'bc1': tf.get_variable('B0', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
-            'bc2': tf.get_variable('B1', shape=(64), initializer=tf.contrib.layers.xavier_initializer()),
-            'bc3': tf.get_variable('B2', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
-            'bd1': tf.get_variable('B3', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
-            'out': tf.get_variable('B4', shape=(10), initializer=tf.contrib.layers.xavier_initializer()),
+            'bc1': tf.get_variable('b0', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
+            'bc2': tf.get_variable('b1', shape=(64), initializer=tf.contrib.layers.xavier_initializer()),
+            'bc3': tf.get_variable('b2', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
+            'bd1': tf.get_variable('b3', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
+            'out': tf.get_variable('b4', shape=(10), initializer=tf.contrib.layers.xavier_initializer()),
         }
      
         
@@ -119,44 +121,108 @@ class CNN:
         correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
         #calculate accuracy across all the given images and average them out. 
         accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-        return cost, optimizer, accuracy
+        return optimizer, accuracy, cost
     
     
-    def train(self, train_X, train_y, test_X, test_y):
+    #def train(self, info_train, anns_train, info_val, anns_val):
+    def train(self, info_train, anns_train, info_val, anns_val):
+        # implements a reinitializable iterator
+        # see https://medium.com/ymedialabs-innovation/how-to-use-dataset-and-iterators-in-tensorflow-with-code-samples-3bb98b6b74ab
         print("training the network...")
+        
+        # Reads an image from a file, decodes it into a dense tensor, and resizes it
+        # to a fixed shape.
+        def _parse_function(filename, label):
+          image_string = tf.read_file(filename)
+          image_decoded = tf.image.decode_jpeg(image_string)
+          image_resized = tf.image.resize_images(image_decoded, [28, 28])
+          return image_resized, label
+      
+        print('creating datasets...')
+        # A vector of filenames.
+        filenames_train = tf.constant([f.get('file_name') for f in info_train])
+        filenames_val = tf.constant([f.get('file_name') for f in info_val])
+        # `labels[i]` is the label for the image in `filenames[i].
+        labels_train = tf.constant([f.get('category_id') for f in anns_train])
+        labels_val = tf.constant([f.get('category_id') for f in anns_val])
+        
+        #might improve efficiency for large datasets
+        placeholder_X = tf.placeholder(filenames_train.dtype, filenames_train.shape)
+        placeholder_y = tf.placeholder(labels_train.dtype, labels_train.shape)
+        
+        # Create separate Datasets for training and validation
+        os.chdir( self.img_dir_train )
+        train_dataset = tf.data.Dataset.from_tensor_slices((placeholder_X, placeholder_y))
+        train_dataset = train_dataset.batch(self.batch_size).map(_parse_function)
+        os.chdir( self.img_dir_val )
+        val_dataset = tf.data.Dataset.from_tensor_slices((placeholder_X, placeholder_y))
+        val_dataset = val_dataset.batch(self.batch_size).map(_parse_function)
+        print('datasets created!')
+        
+        # Iterator has to have same output types across all Datasets to be used
+        iterator = tf.data.Iterator.from_structure(train_dataset.output_types, train_dataset.output_shapes)
+        data_X, data_y = iterator.get_next()
+        data_y = tf.cast(data_y, tf.int32)
+        data_y = tf.one_hot(data_y, depth = self.n_classes)
+        
+        # Initialize with required Datasets
+        train_iterator = iterator.make_initializer(train_dataset)
+        val_iterator = iterator.make_initializer(val_dataset)
+        
         # Initializing the variables and operations
         init = tf.global_variables_initializer()
-        cost, optimizer, accuracy = self.operations()
+        optimizer, accuracy, cost = self.operations()
         
         with tf.Session() as sess:
             sess.run(init) 
-            train_loss = []
-            test_loss = []
-            train_accuracy = []
-            test_accuracy = []
+            train_losses = []
+            val_losses = []
+            train_accuracies = []
+            val_accuracies = []
             summary_writer = tf.summary.FileWriter('./Output', sess.graph)
-            for i in range(self.training_iters):
-                for batch in range(len(train_X)//self.batch_size):
-                    batch_x = train_X[batch*self.batch_size:min((batch+1)*self.batch_size,len(train_X))]
-                    batch_y = train_y[batch*self.batch_size:min((batch+1)*self.batch_size,len(train_y))]    
-                    # Run optimization op (backprop).
-                    # Calculate batch loss and accuracy
-                    opt = sess.run(optimizer, feed_dict={self.image: batch_x, self.labels: batch_y})
-                    loss, acc = sess.run([cost, accuracy], feed_dict={self.image: batch_x, self.labels: batch_y})
-                print("Iter " + str(i) + ", Loss= " + \
-                              "{:.6f}".format(loss) + ", Training Accuracy= " + \
-                              "{:.5f}".format(acc))
-                print("Optimization Finished!")
+            for i in range(self.epochs):
+                train_loss, train_accuracy = 0, 0
+                val_loss, val_accuracy = 0, 0
+                # Start train iterator
+                sess.run(train_iterator, feed_dict = {placeholder_X: filenames_train, placeholder_y: labels_train})
+                try:
+                    with tf.tqdm(total = len(labels_train)) as pbar:
+                        while True:
+                            _, acc, loss = sess.run([optimizer, accuracy, cost])
+                            train_loss += loss
+                            train_accuracy += acc
+                            pbar.update(self.batch_size)
+                except tf.errors.OutOfRangeError:
+                    pass
                 
-        # Calculate accuracy for all test images
-        test_acc,valid_loss = sess.run([accuracy,cost], feed_dict={x: test_X, y: test_y})
-        train_loss.append(loss)
-        test_loss.append(valid_loss)
-        train_accuracy.append(acc)
-        test_accuracy.append(test_acc)
-        print("Testing Accuracy:","{:.5f}".format(test_acc))
+                # Start validation iterator
+                sess.run(val_iterator, feed_dict = {placeholder_X: filenames_val, placeholder_y: labels_val})
+                try:
+                    while True:
+                        acc, loss = sess.run([accuracy, cost])
+                        val_loss += loss
+                        val_accuracy += acc
+                except tf.errors.OutOfRangeError:
+                    pass
         
-        summary_writer.close()
-        return train_loss, train_accuracy, test_loss, test_accuracy
+                print('\nEpoch: {}'.format(i + 1))
+                print('Train accuracy: {:.4f}, loss: {:.4f}'.format(train_accuracy / len(labels_train),
+                                                                     train_loss / len(labels_train)))
+                print('Val accuracy: {:.4f}, loss: {:.4f}\n'.format(val_accuracy / len(labels_val), 
+                                                                    val_loss / len(labels_val)))
+
+
+                # Append data of current epoch
+                train_losses.append(train_loss / len(labels_train))
+                val_losses.append(val_loss / len(labels_val))
+                train_accuracies.append(train_accuracy / len(labels_train))
+                val_accuracies.append(val_accuracy / len(labels_val))
+        
+            summary_writer.close()
+        return train_losses, train_accuracies, val_losses, val_accuracies
     
+
+
+
+
 

@@ -110,6 +110,7 @@ class Data:
         return images
     
     
+    # ---------------- not in use anymore!!!
     def create_dataset(self, info, anns):        
         # Reads an image from a file, decodes it into a dense tensor, and resizes it
         # to a fixed shape.
@@ -129,7 +130,7 @@ class Data:
         # Apply one-hot encoding to labels
         # This converts the integer labels to a vector of 0s with a 1 for the 
         # category that the object belongs to
-        labels = tf.one_hot(labels, depth=3)
+        #labels = tf.one_hot(labels, depth=3)
         
         #might improve efficiency for large datasets
         #filenames_placeholder = tf.placeholder(filenames.dtype, filenames.shape)
