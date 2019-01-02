@@ -186,17 +186,22 @@ class CNN:
                 val_loss, val_accuracy = 0, 0
                 
                 # Start train iterator
+                print("Running training session...")
                 os.chdir( self.img_dir_train )
                 sess.run(train_iterator)
+                n = 1
                 try:
                     while True:
                         opt, acc, loss = sess.run([optimizer, accuracy, cost])
                         train_loss += loss
                         train_accuracy += acc
+                        print("Processed image", n)
+                        n += 1
                 except tf.errors.OutOfRangeError:
                     pass
                 
                 # Start validation iterator
+                print("Running validation session...")
                 os.chdir( self.img_dir_val )
                 sess.run(val_iterator)
                 try:
