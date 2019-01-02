@@ -164,7 +164,7 @@ class CNN:
         iterator = tf.data.Iterator.from_structure(train_dataset.output_types, train_dataset.output_shapes)
         data_X, data_y = iterator.get_next()
         data_y = tf.cast(data_y, tf.int32)
-        #data_y = tf.one_hot(data_y, depth = self.n_classes)
+        data_y = tf.one_hot(data_y, depth = self.n_classes)
         optimizer, accuracy, cost = self.operations(data_X, data_y)
         
         # Initialize with required Datasets
@@ -184,7 +184,9 @@ class CNN:
             for i in range(self.epochs):
                 train_loss, train_accuracy = 0, 0
                 val_loss, val_accuracy = 0, 0
+                
                 # Start train iterator
+                os.chdir( self.img_dir_train )
                 sess.run(train_iterator)
                 try:
                     while True:
@@ -195,6 +197,7 @@ class CNN:
                     pass
                 
                 # Start validation iterator
+                os.chdir( self.img_dir_val )
                 sess.run(val_iterator)
                 try:
                     while True:
