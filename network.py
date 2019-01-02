@@ -141,22 +141,22 @@ class CNN:
        #ValueError: Shape must be rank 0 but is rank 1 for 'ReadFile' (op: 'ReadFile') with input shapes: [?].
         print('creating datasets...')
         # A vector of filenames.
-        filenames_train = [f.get('file_name') for f in info_train]
-        filenames_val = [f.get('file_name') for f in info_val]
+        filenames_train = tf.constant([f.get('file_name') for f in info_train])
+        filenames_val = tf.constant([f.get('file_name') for f in info_val])
         # `labels[i]` is the label for the image in `filenames[i].
-        labels_train = [f.get('category_id') for f in anns_train]
-        labels_val = [f.get('category_id') for f in anns_val]
+        labels_train = tf.constant([f.get('category_id') for f in anns_train])
+        labels_val = tf.constant([f.get('category_id') for f in anns_val])
         
         #might improve efficiency for large datasets
-        placeholder_X = tf.placeholder(filenames_train.dtype, filenames_train.shape)
-        placeholder_y = tf.placeholder(labels_train.dtype, labels_train.shape)
+        #placeholder_X = tf.placeholder(filenames_train.dtype, filenames_train.shape)
+        #placeholder_y = tf.placeholder(labels_train.dtype, labels_train.shape)
         
         # Create separate Datasets for training and validation
         os.chdir( self.img_dir_train )
-        train_dataset = tf.data.Dataset.from_tensor_slices((placeholder_X, placeholder_y))
+        train_dataset = tf.data.Dataset.from_tensor_slices((filenames_train, labels_train))
         train_dataset = train_dataset.map(_parse_function).batch(self.batch_size)
         os.chdir( self.img_dir_val )
-        val_dataset = tf.data.Dataset.from_tensor_slices((placeholder_X, placeholder_y))
+        val_dataset = tf.data.Dataset.from_tensor_slices((filenames_val, labels_val))
         val_dataset = val_dataset.map(_parse_function).batch(self.batch_size)
         print('datasets created!')
         
@@ -185,19 +185,17 @@ class CNN:
                 train_loss, train_accuracy = 0, 0
                 val_loss, val_accuracy = 0, 0
                 # Start train iterator
-                sess.run(train_iterator, feed_dict = {placeholder_X: filenames_train, placeholder_y: labels_train})
+                sess.run(train_iterator)
                 try:
-                    with tf.tqdm(total = len(labels_train)) as pbar:
-                        while True:
-                            _, acc, loss = sess.run([optimizer, accuracy, cost])
-                            train_loss += loss
-                            train_accuracy += acc
-                            pbar.update(self.batch_size)
+                    while True:
+                        _, acc, loss = sess.run([optimizer, accuracy, cost])
+                        train_loss += loss
+                        train_accuracy += acc
                 except tf.errors.OutOfRangeError:
                     pass
                 
                 # Start validation iterator
-                sess.run(val_iterator, feed_dict = {placeholder_X: filenames_val, placeholder_y: labels_val})
+                sess.run(val_iterator)
                 try:
                     while True:
                         acc, loss = sess.run([accuracy, cost])
