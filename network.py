@@ -112,9 +112,9 @@ class CNN:
         return out
     
     
-    def operations(self):
-        pred = self.conv_net(self.image, self.weights, self.biases)
-        cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=self.labels))
+    def operations(self, x, y):
+        pred = self.conv_net(x, self.weights, self.biases)
+        cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
         optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(cost)
     
         #Here you check whether the index of the maximum value of the predicted image is equal to the actual labelled image. and both will be a column vector.
@@ -172,7 +172,7 @@ class CNN:
         
         # Initializing the variables and operations
         init = tf.global_variables_initializer()
-        optimizer, accuracy, cost = self.operations()
+        optimizer, accuracy, cost = self.operations(data_X, data_y)
         
         with tf.Session() as sess:
             sess.run(init) 
