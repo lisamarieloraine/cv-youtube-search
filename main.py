@@ -28,6 +28,7 @@ anns_val = data_val.get_annotations()
 info_val = data_val.get_info(anns_val)
 classes_val, counts_val = data_val.convert_labels(anns_val)
 
+tf.reset_default_graph() 
 
 
 # Set up the neural network
@@ -39,7 +40,6 @@ n_classes = 3
 network = CNN(training_iters, learning_rate, batch_size, n_input, n_classes, img_path_train, img_path_val)
 
 # Train the network using the training data
-tf.reset_default_graph() 
 train_loss, train_accuracy, val_loss, val_accuracy = network.train(info_train, classes_train, info_val, classes_val)
 #network.plot_loss(train_loss, val_loss)
 #network.plot_accuracy(train_accuracy, val_accuracy)

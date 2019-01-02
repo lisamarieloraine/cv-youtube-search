@@ -42,7 +42,7 @@ class CNN:
             'bc2': tf.get_variable('b1', shape=(64), initializer=tf.contrib.layers.xavier_initializer()),
             'bc3': tf.get_variable('b2', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
             'bd1': tf.get_variable('b3', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
-            'out': tf.get_variable('b4', shape=(10), initializer=tf.contrib.layers.xavier_initializer()),
+            'out': tf.get_variable('b4', shape=(n_classes), initializer=tf.contrib.layers.xavier_initializer()),
         }
      
         
@@ -90,7 +90,7 @@ class CNN:
         conv1 = self.conv2d(x, self.weights['wc1'], self.biases['bc1'])
         # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 14*14 matrix.
         conv1 = self.maxpool2d(conv1, k=2)
-    
+        
         # Convolution Layer
         # here we call the conv2d function we had defined above and pass the input image x, weights wc2 and bias bc2.
         conv2 = self.conv2d(conv1, self.weights['wc2'], self.biases['bc2'])
@@ -106,6 +106,7 @@ class CNN:
         fc1 = tf.reshape(conv3, [-1, self.weights['wd1'].get_shape().as_list()[0]])
         fc1 = tf.add(tf.matmul(fc1, self.weights['wd1']), self.biases['bd1'])
         fc1 = tf.nn.relu(fc1)
+
         # Output, class prediction
         # finally we multiply the fully connected layer with the weights and add a bias term. 
         out = tf.add(tf.matmul(fc1, self.weights['out']), self.biases['out'])
@@ -129,23 +130,22 @@ class CNN:
         # implements a reinitializable iterator
         # see https://medium.com/ymedialabs-innovation/how-to-use-dataset-and-iterators-in-tensorflow-with-code-samples-3bb98b6b74ab
         print("training the network...")
-        tf.reset_default_graph() 
         
         # Reads an image from a file, decodes it into a dense tensor, and resizes it
         # to a fixed shape.
         def _parse_function(filename, label):
           image_string = tf.read_file(filename)
-          image_decoded = tf.image.decode_jpeg(image_string)
+          image_decoded = tf.image.decode_jpeg(image_string, channels=1)
           image_resized = tf.image.resize_images(image_decoded, [28, 28])
           return image_resized, label
        #ValueError: Shape must be rank 0 but is rank 1 for 'ReadFile' (op: 'ReadFile') with input shapes: [?].
         print('creating datasets...')
         # A vector of filenames.
-        filenames_train = tf.constant([f.get('file_name') for f in info_train])
-        filenames_val = tf.constant([f.get('file_name') for f in info_val])
+        filenames_train = [f.get('file_name') for f in info_train]
+        filenames_val = [f.get('file_name') for f in info_val]
         # `labels[i]` is the label for the image in `filenames[i].
-        labels_train = tf.constant([f.get('category_id') for f in anns_train])
-        labels_val = tf.constant([f.get('category_id') for f in anns_val])
+        labels_train = [f.get('category_id') for f in anns_train]
+        labels_val = [f.get('category_id') for f in anns_val]
         
         #might improve efficiency for large datasets
         placeholder_X = tf.placeholder(filenames_train.dtype, filenames_train.shape)
