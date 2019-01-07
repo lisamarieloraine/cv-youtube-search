@@ -42,7 +42,7 @@ def search_and_store(_search_term, _filename):
 
 
 if __name__ == '__main__':
-    _list = search_and_store('qtpie', 'unused')
+    _list = search_and_store('sark', 'unused')
     print('--- Search function ---')
     for link in _list:
         print(link)
