@@ -50,7 +50,7 @@ def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_fil
     print('Scraping Youtube data')
 
     filter_term = filter_search_string(_search_term, [_uploadtime_filter, _feature_filter, _duration_filter])  # Format filter terms
-    formatted_search_term = filter_term.replace(" ", "+").replace(",", "%2C")  # Format search term with spaces, commas
+    formatted_search_term = filter_term.replace("+", "%2B").replace(",", "%2C").replace(" ", "+")  # Format search term with pluses, commas, spaces
     print(f'Using filter search term: {formatted_search_term}')
 
     youtube_url = f'https://www.youtube.com/results?{_sortby_filter}search_query={formatted_search_term}'
@@ -58,7 +58,7 @@ def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_fil
 
 
 if __name__ == '__main__':
-    _list = search_and_store('sark', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Features.Subtitles.value, Duration.Short.value)
+    _list = search_and_store('banana +recipe', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Features.Subtitles.value, Duration.Short.value)
     print('--- Search function ---')
     for link in _list:
         print(link)
