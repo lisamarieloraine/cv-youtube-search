@@ -1,7 +1,7 @@
 from Scripts.WebScraping.VerifyRequest import get_verified_response
 from bs4 import BeautifulSoup
 from re import compile
-from Scripts.WebScraping.FilterTerms import SortBy, UploadDate, Features
+from Scripts.WebScraping.FilterTerms import SortBy, UploadDate, Features, Duration
 
 
 # @Description Filters hyper-links using regex pattern matching
@@ -44,11 +44,11 @@ def filter_search_string(_search_term, _filter=list()):
 # @Description Higher order function to scrape and store data
 # @argument <class 'string'> and <class 'string'>
 # @return <class 'list'>
-def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_filter='', _feature_filter=''):
+def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_filter='', _feature_filter='', _duration_filter=''):
     """Returns list of search results while storing them in json"""
     print('Scraping Youtube data')
 
-    filter_term = filter_search_string(_search_term, [_uploadtime_filter, _feature_filter])  # Format filter terms
+    filter_term = filter_search_string(_search_term, [_uploadtime_filter, _feature_filter, _duration_filter])  # Format filter terms
     formatted_search_term = filter_term.replace(" ", "+").replace(",", "%2C")  # Format search term with spaces, commas
     print(f'Using filter search term: {formatted_search_term}')
 
@@ -57,7 +57,7 @@ def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_fil
 
 
 if __name__ == '__main__':
-    _list = search_and_store('sark', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Features.Subtitles.value)
+    _list = search_and_store('sark', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Features.Subtitles.value, Duration.Short.value)
     print('--- Search function ---')
     for link in _list:
         print(link)

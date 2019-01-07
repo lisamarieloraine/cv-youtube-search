@@ -22,3 +22,8 @@ class Features(Enum):
     FourKResolution = '4k'
     HighDefinition = 'hd'
     Subtitles = 'cc'
+
+
+class Duration(Enum):
+    Long = 'long'
+    Short = 'short'
