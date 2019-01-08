@@ -40,7 +40,7 @@ def filter_search_string(_search_term, _filter=list()):
     # TODO: '+recipe' For a forced recipe video
     result = f'{_search_term} +recipe -news'
     for term in _filter:
-        if term is not False:
+        if term != '':
             result += f', {term}'
     return result
 
