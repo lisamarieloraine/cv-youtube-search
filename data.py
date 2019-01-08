@@ -29,9 +29,13 @@ class Data:
         return anns
     
     
-    def get_info(self, anns):
+    def get_info(self, anns, file_name):
         img_ids = [a.get('image_id') for a in anns]
         info = self.API.loadImgs(img_ids)
+        # Save to json file
+        with open(file_name, 'w') as fp:
+            json.dump(info, fp)
+        print('saved info to json file!') 
         return info
     
     
@@ -71,7 +75,7 @@ class Data:
         return labels, counts
     
     
-    def convert_labels(self, anns):
+    def convert_labels(self, anns, file_name):
         print('converting labels...') 
         apple = self.API.getCatIds(catNms=['apple'])[0]
         banana = self.API.getCatIds(catNms=['banana'])[0]
@@ -94,10 +98,10 @@ class Data:
                 counts[other] += 1
                 
         # Save to json file
-        with open('annotations.json', 'w') as fp:
+        with open(file_name, 'w') as fp:
             json.dump(anns, fp)
-        print('saved annotations to json file!')       
-        return anns, counts
+        print('saved annotations to json file!')   
+        return anns
     
     
     def load_images(self, info): # ---------------- not in use anymore!!!
