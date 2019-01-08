@@ -35,7 +35,7 @@ def import_youtube_data(_youtube_url):
 # @return <class 'string'>
 def filter_search_string(_search_term, _filter=list()):
     # TODO: '+recipe' For a forced recipe video
-    result = _search_term
+    result = f'{_search_term} +recipe'
     for term in _filter:
         if term is not False:
             result += f', {term}'
@@ -54,11 +54,12 @@ def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_fil
     print(f'Using filter search term: {formatted_search_term}')
 
     youtube_url = f'https://www.youtube.com/results?{_sortby_filter}search_query={formatted_search_term}'
+    print(youtube_url)
     return import_youtube_data(youtube_url)
 
 
 if __name__ == '__main__':
-    _list = search_and_store('banana +recipe', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Features.Subtitles.value, Duration.Short.value)
+    _list = search_and_store('chicken parmesan', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Features.Subtitles.value, Duration.Short.value)
     print('--- Search function ---')
     for link in _list:
         print(link)
