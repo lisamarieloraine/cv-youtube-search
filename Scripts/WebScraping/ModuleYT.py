@@ -1,7 +1,10 @@
+import webbrowser
+
 from Scripts.WebScraping.VerifyRequest import get_verified_response
+from Scripts.WebScraping.FilterTerms import SortBy, UploadDate, Features, Duration
+from Scripts.WebScraping.PullThumbnail import get_thumbnail
 from bs4 import BeautifulSoup
 from re import compile
-from Scripts.WebScraping.FilterTerms import SortBy, UploadDate, Features, Duration
 
 
 # @Description Filters hyper-links using regex pattern matching
@@ -35,7 +38,7 @@ def import_youtube_data(_youtube_url):
 # @return <class 'string'>
 def filter_search_string(_search_term, _filter=list()):
     # TODO: '+recipe' For a forced recipe video
-    result = f'{_search_term} +recipe'
+    result = f'{_search_term} +recipe -news'
     for term in _filter:
         if term is not False:
             result += f', {term}'
@@ -59,10 +62,10 @@ def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_fil
 
 
 if __name__ == '__main__':
-    _list = search_and_store('chicken parmesan', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Features.Subtitles.value, Duration.Short.value)
+    _list = search_and_store('banana', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Features.Subtitles.value, Duration.Short.value)
     print('--- Search function ---')
     for link in _list:
-        print(link)
+        print(f'Video: {link}')
+        print(f'Thumbnail: {get_thumbnail(link)}')
+        # webbrowser.open(get_thumbnail(link))
     print(len(_list))
-
-    # search_query = f'https://www.youtube.com/results?search_query=banana&pbj=1'
