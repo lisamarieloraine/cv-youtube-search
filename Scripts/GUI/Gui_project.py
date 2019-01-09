@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox #To be able to have pop up message
 from tkinter import filedialog
 from tkinter import ttk
+from Scripts.WebScraping.ModuleYT import search_and_store
 
 # Main lay out choices
 main_bg_colour = '#e1c793'
@@ -65,6 +66,10 @@ def pic_from_gallery():
 
 def make_pic():
     pass
+
+def print_URL(entry):
+    print(search_and_store(entry.get(), 'x'))
+
 
 def result_window():
     # Build elements
@@ -140,6 +145,12 @@ def result_window():
                          font=(main_font,25),
                          bg= main_bg_colour)
 
+    input_searchterm = Entry(root,
+                             textvariable= StringVar)
+    search_button = Button(root,
+                           command=lambda: print_URL(input_searchterm))
+
+
 
 
     #Place elements
@@ -185,22 +196,27 @@ def result_window():
 
     go_back_button.place(x=710,
                          y=20)
+
     result_label.place(x=300,
                        y=10)
 
+    input_searchterm.place(x=300,
+                           y=100)
 
+    search_button.place(x=450,
+                        y=100)
 
 
 #Create Buttons
 take_picture_button = Button(root,
-                             text = 'hoi',
+                             text = 'Take picture',
                              bg= main_button_colour,
                              font = main_font,
                              command = show_result_window)
 
 
 upload_picture_button =  Button(root,
-                                text=' upload',
+                                text='Upload picture',
                                 bg = main_button_colour,
                                 font = main_font,
                                 command = pic_from_gallery)
