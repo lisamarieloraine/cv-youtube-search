@@ -1,0 +1,8 @@
+\.idea/
+/.metadata/
+bin/**
+out/
+.recommenders/
+.class
+.spyproject/
+__pycache__/
