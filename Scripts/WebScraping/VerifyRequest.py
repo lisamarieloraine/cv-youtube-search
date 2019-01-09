@@ -10,7 +10,7 @@ def get_verified_response(_url):
     http = urllib3.PoolManager(
         cert_reqs='CERT_REQUIRED',
         ca_certs=certifi.where(),
-        timeout=urllib3.Timeout(connect=1.0, read=2.0)
+        timeout=urllib3.Timeout(connect=2.0, read=2.0)
     )
     try:
         requests = http.request('GET', _url)  # http.request
