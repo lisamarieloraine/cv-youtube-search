@@ -3,6 +3,7 @@ from enum import Enum
 
 # Ends with '%253D'
 class SortBy(Enum):
+    Default = ''
     Relevance = 'sp=CAA%253D&'
     UploadTime = 'sp=CAI%253D&'
     ViewCount = 'sp=CAM%253D&'
@@ -10,6 +11,7 @@ class SortBy(Enum):
 
 
 class UploadDate(Enum):
+    Default = ''
     ThisHour = 'hour'  # 'SBAgBEAE'
     ThisDay = 'today'  # 'SBAgCEAE'
     ThisWeek = 'week'  # 'SBAgDEAE'
@@ -18,6 +20,7 @@ class UploadDate(Enum):
 
 
 class Features(Enum):
+    Default = ''
     Live = 'live'
     FourKResolution = '4k'
     HighDefinition = 'hd'
@@ -25,5 +28,6 @@ class Features(Enum):
 
 
 class Duration(Enum):
+    Default = ''
     Long = 'long'
     Short = 'short'
