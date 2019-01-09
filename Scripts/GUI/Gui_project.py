@@ -3,6 +3,40 @@ from tkinter import messagebox #To be able to have pop up message
 from tkinter import filedialog
 from tkinter import ttk
 from Scripts.WebScraping.ModuleYT import search_and_store
+from Scripts.WebScraping.FilterTerms import SortBy, Features, UploadDate, Duration
+
+# Global filter Variables
+SORTBY = SortBy.Default.value  # String
+FEATURES = []  # List<string>
+UPLOADDATE = UploadDate.Default.value  # String
+DURATION = Duration.Default.value  # String
+
+SORTBY_DICT = {
+    'Default': SortBy.Default.value,
+    'Relevance': SortBy.Relevance.value,
+    'Upload Time': SortBy.UploadTime.value,
+    'View Count': SortBy.ViewCount.value,
+    'Rating': SortBy.Rating.value
+}
+FEATURES_DICT = {
+    'Subtitles': Features.Subtitles.value,
+    'Live': Features.Live.value,
+    '4K': Features.FourKResolution.value,
+    'High Definition': Features.HighDefinition.value
+}
+UPLOADDATE_DICT = {
+    'Default': UploadDate.Default.value,
+    'Past hour': UploadDate.ThisHour.value,
+    'Today': UploadDate.ThisDay.value,
+    'This week': UploadDate.ThisWeek.value,
+    'This month': UploadDate.ThisMonth.value,
+    'This year': UploadDate.ThisYear.value
+}
+DURATION_DICT = {
+    'Default': Duration.Default.value,
+    'Long': Duration.Long.value,
+    'Short': Duration.Short.value
+}
 
 # Main lay out choices
 main_bg_colour = '#e1c793'
@@ -64,11 +98,43 @@ def main_window():
 def pic_from_gallery():
     file1=filedialog.askopenfile()
 
+
 def make_pic():
     pass
 
+
 def print_URL(entry):
-    print(search_and_store(entry.get(), 'x'))
+    print('Search')
+    print(search_and_store(entry.get(), 'unused', SORTBY, UPLOADDATE, DURATION, FEATURES))
+
+
+# Description: Sets the global variable SORTBY everytime the combobox is updated
+def sort_combo_func(event=None):
+    global SORTBY
+    SORTBY = SORTBY_DICT[event.widget.get()]
+    print(f'event.widget: {event.widget.get()}')
+
+
+def feature_func(feature_string):
+    global FEATURES
+    if feature_string in FEATURES:
+        FEATURES.remove(feature_string)
+    else:
+        FEATURES.append(feature_string)
+    print(f'Feature string: {feature_string}')
+
+# Description: Sets the global variable UPLOADDATE everytime the combobox is updated
+def upload_combo_func(event=None):
+    global UPLOADDATE
+    UPLOADDATE = UPLOADDATE_DICT[event.widget.get()]
+    print(f'event.widget: {event.widget.get()}')
+
+
+# Description: Sets the global variable DURATION everytime the combobox is updated
+def duration_combo_func(event=None):
+    global DURATION
+    DURATION = DURATION_DICT[event.widget.get()]
+    print(f'event.widget: {event.widget.get()}')
 
 
 def result_window():
@@ -89,9 +155,11 @@ def result_window():
                           bg= side_bar_colour)
 
     sort_combobox = ttk.Combobox(root,
-                                 values=('Relevance', 'Upload Time', 'View Count', 'Rating'),
+                                 values=('Default', 'Relevance', 'Upload Time', 'View Count', 'Rating'),
                                  width=20,
-                                 font=(main_font,10))
+                                 font=(main_font,10),
+                                 )
+    sort_combobox.bind('<<ComboboxSelected>>', sort_combo_func)
 
     upload_date_label = Label(root,
                               text='Upload Date',
@@ -99,9 +167,10 @@ def result_window():
                               bg= side_bar_colour)
 
     upload_date_combobox = ttk.Combobox(root,
-                                        values=('Past hour', 'Today', 'This week ', 'This month', 'This year'),
+                                        values=('Default', 'Past hour', 'Today', 'This week', 'This month', 'This year'),
                                         width=20,
                                         font=(main_font, 10))
+    upload_date_combobox.bind('<<ComboboxSelected>>', upload_combo_func)
 
     duration_label = Label(root,
                            text='Duration',
@@ -109,9 +178,11 @@ def result_window():
                            bg=side_bar_colour)
 
     duration_combobox = ttk.Combobox(root,
-                                     values=('Long', 'Short'),
+                                     values=('Default', 'Long', 'Short'),
                                      width=20,
                                      font=(main_font, 10))
+    duration_combobox.bind('<<ComboboxSelected>>', duration_combo_func)
+
     filter_label = Label(root,
                          text='Filter',
                          font=(main_font, 10),
@@ -120,22 +191,26 @@ def result_window():
     Subtitle_checkbox = Checkbutton(root,
                                     text='Subtitles',
                                     width=20,
-                                    bg=side_bar_colour)
+                                    bg=side_bar_colour,
+                                    command=lambda: feature_func(Features.Subtitles.value))
 
     live_checkbox = Checkbutton(root,
                                 text='Live',
                                 width=20,
-                                bg=side_bar_colour)
+                                bg=side_bar_colour,
+                                command=lambda: feature_func(Features.Live.value))
 
     FourKResolution_checkbox= Checkbutton(root,
                                     text='4K',
                                     width=20,
-                                    bg=side_bar_colour)
+                                    bg=side_bar_colour,
+                                    command=lambda: feature_func(Features.FourKResolution.value))
 
     HighDefinition_checkbox = Checkbutton(root,
                                  text='High Definition',
                                  width=20,
-                                 bg=side_bar_colour)
+                                 bg=side_bar_colour,
+                                 command=lambda: feature_func(Features.HighDefinition.value))
     go_back_button = Button(root,
                             width=5,
                             height=2,
