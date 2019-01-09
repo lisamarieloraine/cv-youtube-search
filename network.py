@@ -6,11 +6,10 @@ Created on Wed Dec 12 14:47:15 2018
 """
 
 # Import modules
-import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]="0" #for training on gpu
+#os.environ["CUDA_VISIBLE_DEVICES"]="0" #for training on gpu
 
 
 class CNN:
@@ -126,39 +125,10 @@ class CNN:
     
     
     #def train(self, info_train, anns_train, info_val, anns_val):
-    def train(self, info_train, anns_train, info_val, anns_val):
+    def train(self, train_dataset, size_train, val_dataset, size_val):
         # implements a reinitializable iterator
         # see https://medium.com/ymedialabs-innovation/how-to-use-dataset-and-iterators-in-tensorflow-with-code-samples-3bb98b6b74ab
         print("training the network...")
-        
-        # Reads an image from a file, decodes it into a dense tensor, and resizes it
-        # to a fixed shape.
-        def _parse_function(filename, label):
-          image_string = tf.read_file(filename)
-          image_decoded = tf.image.decode_jpeg(image_string, channels=1)
-          image_resized = tf.image.resize_images(image_decoded, [28, 28])
-          return image_resized, label
-       #ValueError: Shape must be rank 0 but is rank 1 for 'ReadFile' (op: 'ReadFile') with input shapes: [?].
-        print('creating datasets...')
-        # A vector of filenames.
-        filenames_train = tf.constant([f.get('file_name') for f in info_train])
-        filenames_val = tf.constant([f.get('file_name') for f in info_val])
-        # `labels[i]` is the label for the image in `filenames[i].
-        labels_train = tf.constant([f.get('category_id') for f in anns_train])
-        labels_val = tf.constant([f.get('category_id') for f in anns_val])
-        
-        #might improve efficiency for large datasets
-        #placeholder_X = tf.placeholder(filenames_train.dtype, filenames_train.shape)
-        #placeholder_y = tf.placeholder(labels_train.dtype, labels_train.shape)
-        
-        # Create separate Datasets for training and validation
-        os.chdir( self.img_dir_train )
-        train_dataset = tf.data.Dataset.from_tensor_slices((filenames_train, labels_train))
-        train_dataset = train_dataset.map(_parse_function).batch(self.batch_size)
-        os.chdir( self.img_dir_val )
-        val_dataset = tf.data.Dataset.from_tensor_slices((filenames_val, labels_val))
-        val_dataset = val_dataset.map(_parse_function).batch(self.batch_size)
-        print('datasets created!')
         
         # Iterator has to have same output types across all Datasets to be used
         iterator = tf.data.Iterator.from_structure(train_dataset.output_types, train_dataset.output_shapes)
@@ -213,17 +183,17 @@ class CNN:
                     pass
         
                 print('\nEpoch: {}'.format(i + 1))
-                print('Train accuracy: {:.4f}, loss: {:.4f}'.format(train_accuracy / len(labels_train),
-                                                                     train_loss / len(labels_train)))
-                print('Val accuracy: {:.4f}, loss: {:.4f}\n'.format(val_accuracy / len(labels_val), 
-                                                                    val_loss / len(labels_val)))
+                print('Train accuracy: {:.4f}, loss: {:.4f}'.format(train_accuracy / size_train,
+                                                                     train_loss / size_train))
+                print('Val accuracy: {:.4f}, loss: {:.4f}\n'.format(val_accuracy / size_val, 
+                                                                    val_loss / size_val))
 
 
                 # Append data of current epoch
-                train_losses.append(train_loss / len(labels_train))
-                val_losses.append(val_loss / len(labels_val))
-                train_accuracies.append(train_accuracy / len(labels_train))
-                val_accuracies.append(val_accuracy / len(labels_val))
+                train_losses.append(train_loss / size_train)
+                val_losses.append(val_loss / size_val)
+                train_accuracies.append(train_accuracy / size_train)
+                val_accuracies.append(val_accuracy / size_val)
         
             summary_writer.close()
         return train_losses, train_accuracies, val_losses, val_accuracies

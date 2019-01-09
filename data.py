@@ -22,60 +22,26 @@ class Data:
         print("Directory changed successfully:", retval)
         self.API = coco.COCO(annotation_name)
         
-        
-    def get_annotations(self, crowds=0):
-        ann_ids = self.API.getAnnIds(imgIds=[], catIds=[], areaRng=[], iscrowd=crowds)
+    
+    def create_dict(self, file_name_info, file_name_anns):
+        ann_ids = self.API.getAnnIds(imgIds=[], catIds=[], areaRng=[], iscrowd=False)
         anns = self.API.loadAnns(ann_ids)
-        return anns
-    
-    
-    def get_info(self, anns, file_name):
         img_ids = [a.get('image_id') for a in anns]
         info = self.API.loadImgs(img_ids)
-        # Save to json file
-        with open(file_name, 'w') as fp:
-            json.dump(info, fp)
-        print('saved info to json file!') 
-        return info
-    
-    
-    def load_labels(self, anns): # ---------------- not in use anymore!!!
-        print('creating labels...')
-        labels = dict()
-        for a in anns:
-            labels[a.get('image_id')] = a.get('category_id')   
-        return labels
-            
-    def convert_labels_old(self, labels): # ---------------- not in use anymore!!!
-        apple = self.API.getCatIds(catNms=['apple'])[0]
-        banana = self.API.getCatIds(catNms=['banana'])[0]
-        broccoli = self.API.getCatIds(catNms=['broccoli'])[0]
+        images = dict()
         
-        (other, apples, bananas, broccolis) = (0,1,2,3)
-        counts = [0,0,0,0]
-        
-        for key, value in labels.items():
-            if value == apple:
-                labels[key] = apples
-                counts[apples] += 1
-            elif value == banana:
-                labels[key] = bananas
-                counts[bananas] += 1
-            elif value == broccoli:
-                labels[key] = broccolis
-                counts[broccolis] += 1
-            else:
-                labels[key] = other
-                counts[other] += 1
-                
-        # Save to json file
-        with open('classes.json', 'w') as fp:
-            json.dump(labels, fp)
-        print('saved labels to json file!')       
-        return labels, counts
+        # getting categories and image ids of unique images
+        for ann in anns:
+            if 'category_id' in ann.keys() and ann.get('image_id') not in images.keys():
+                images[ann.get('image_id')] = [ann.get('category_id')]       
+        for i in info:
+            if i.get('file_name') not in images[i.get('id')]:
+                images[i.get('id')].append(i.get('file_name'))       
+
+        return images
     
     
-    def convert_labels(self, anns, file_name):
+    def convert_dict(self, images, file_name):
         print('converting labels...') 
         apple = self.API.getCatIds(catNms=['apple'])[0]
         banana = self.API.getCatIds(catNms=['banana'])[0]
@@ -83,70 +49,91 @@ class Data:
         (other, apples, bananas, broccolis) = (-1,0,1,2)
         counts = [0,0,0,0]
         
-        for a in anns:
-            if a.get('category_id') == apple:
-                a['category_id'] = apples
-                counts[apples] += 1
-            elif a.get('category_id') == banana:
-                a['category_id'] = bananas
-                counts[bananas] += 1
-            elif a.get('category_id') == broccoli:
-                a['category_id'] = broccolis
-                counts[broccolis] += 1
-            else:
-                a['category_id'] = other
-                counts[other] += 1
+        for key, value in images.items():
+            if not len(value) == 2:
+                print('Warning: not all info available for image', key)
+            if not type(value[0]) == int:
+                print('Warning: category is of wrong type for image', key)
+            if not type(value[1]) == str:
+                print('Warning: file name is of wrong type for image', key)
                 
+            if value[0] == apple:
+                value[0] = apples
+                counts[1] += 1
+            elif value[0] == banana:
+                value[0] = bananas
+                counts[2] += 1
+            elif value[0] == broccoli:
+                value[0] = broccolis
+                counts[3] += 1
+            else:
+                value[0] = other
+                counts[0] += 1
+                     
         # Save to json file
         with open(file_name, 'w') as fp:
-            json.dump(anns, fp)
-        print('saved annotations to json file!')   
-        return anns
+            json.dump(images, fp)
+        print('saved annotations to json file:', file_name)  
+        print(counts)
+        return images, counts
     
     
-    def load_images(self, info): # ---------------- not in use anymore!!!
-        # converts images to tensors
-        print('converting images to tensors...')
-        images = dict()
-        os.chdir( self.img_dir )
-        for i in info:
-            images[i.get('id')] = tf.image.decode_jpeg(i.get('file_name'), channels=1)
-        return images
+
+    def subset_images(self, images, counts):
+        max_examples = max(counts[1:])
+        labels = [i[0] for i in images.values()]
+        file_names = [i[1] for i in images.values()]
+        to_remove = counts[0] - max_examples
+        remove_count = 0
+        
+        subset_labels = []
+        subset_files = []
+
+        for index, label in enumerate(labels):
+            if label == -1 and remove_count < to_remove:
+                remove_count += 1
+            else:
+                subset_labels.append(labels[index])
+                subset_files.append(file_names[index])
     
-    
-    # ---------------- not in use anymore!!!
-    def create_dataset(self, info, anns):        
+        print("Number of examples BEFORE subsetting:", len(labels))
+        print("Number of examples AFTER subsetting:", len(subset_labels))
+
+        # Save to json files
+        #with open(file_name_ann, 'w') as fp:
+            #json.dump(labels, fp)
+        #with open(file_name_info, 'w') as fp:
+            #json.dump(file_names, fp)
+        return subset_labels, subset_files
+            
+         
+    def create_dataset(self, files, labels, batch_size):        
         # Reads an image from a file, decodes it into a dense tensor, and resizes it
         # to a fixed shape.
         def _parse_function(filename, label):
           image_string = tf.read_file(filename)
-          image_decoded = tf.image.decode_jpeg(image_string)
+          image_decoded = tf.image.decode_jpeg(image_string, channels=1)
           image_resized = tf.image.resize_images(image_decoded, [28, 28])
           return image_resized, label
-        
-        print('creating dataset...')
-        os.chdir( self.img_dir )
+       #ValueError: Shape must be rank 0 but is rank 1 for 'ReadFile' (op: 'ReadFile') with input shapes: [?].
+        print('creating datasets...')
         # A vector of filenames.
-        filenames = tf.constant([f.get('file_name') for f in info])
+        filenames = tf.constant(files)
+
         # `labels[i]` is the label for the image in `filenames[i].
-        labels = tf.constant([f.get('category_id') for f in anns])
-        
-        # Apply one-hot encoding to labels
-        # This converts the integer labels to a vector of 0s with a 1 for the 
-        # category that the object belongs to
-        #labels = tf.one_hot(labels, depth=3)
+        classes = tf.constant(labels)
         
         #might improve efficiency for large datasets
-        #filenames_placeholder = tf.placeholder(filenames.dtype, filenames.shape)
-        #labels_placeholder = tf.placeholder(labels.dtype, labels.shape)
+        #placeholder_X = tf.placeholder(filenames_train.dtype, filenames_train.shape)
+        #placeholder_y = tf.placeholder(labels_train.dtype, labels_train.shape)
         
-        dataset = tf.data.Dataset.from_tensor_slices((filenames, labels))
-        dataset = dataset.map(_parse_function)
+        # Create separate Datasets for training and validation
+        os.chdir( self.img_dir )
+        dataset = tf.data.Dataset.from_tensor_slices((filenames, classes))
+        dataset = dataset.map(_parse_function).batch(batch_size)
         print('dataset created!')
-        return dataset
-            
-
-            
+        
+        return dataset      
             
             
             
