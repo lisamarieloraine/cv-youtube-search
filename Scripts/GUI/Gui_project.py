@@ -297,11 +297,11 @@ upload_picture_button =  Button(root,
                                 command = pic_from_gallery)
 
 # Import pictures
-camera_picture = PhotoImage(file = 'C:\\Users\Daniek\camera.png')
-take_picture_button.config(image = camera_picture)
-
-gallery_picture = PhotoImage(file = 'C:\\Users\Daniek\Afbeelding3.png')
-upload_picture_button.config(image = gallery_picture)
+# camera_picture = PhotoImage(file = 'C:\\Users\Daniek\camera.png')
+# take_picture_button.config(image = camera_picture)
+#
+# gallery_picture = PhotoImage(file = 'C:\\Users\Daniek\Afbeelding3.png')
+# upload_picture_button.config(image = gallery_picture)
 
 main_window()
 
