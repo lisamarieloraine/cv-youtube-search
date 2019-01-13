@@ -38,7 +38,7 @@ def import_youtube_data(_youtube_url):
 # @return <class 'string'>
 def filter_search_string(_search_term, _filter=list()):
     # TODO: '+recipe' For a forced recipe video
-    result = f'{_search_term} +recipe -news'
+    result = f'{_search_term} +recipe'
     for term in _filter:
         if term != '':
             result += f', {term}'
@@ -48,11 +48,11 @@ def filter_search_string(_search_term, _filter=list()):
 # @Description Higher order function to scrape and store data
 # @argument <class 'string'> and <class 'string'>
 # @return <class 'list'>
-def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_filter='', _feature_filter='', _duration_filter=''):
+def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_filter='', _duration_filter='', _feature_filter=list()):
     """Returns list of search results while storing them in json"""
     print('Scraping Youtube data')
 
-    filter_term = filter_search_string(_search_term, [_uploadtime_filter, _feature_filter, _duration_filter])  # Format filter terms
+    filter_term = filter_search_string(_search_term, [_uploadtime_filter, _duration_filter] + _feature_filter)  # Format filter terms
     formatted_search_term = filter_term.replace("+", "%2B").replace(",", "%2C").replace(" ", "+")  # Format search term with pluses, commas, spaces
     print(f'Using filter search term: {formatted_search_term}')
 
@@ -62,7 +62,7 @@ def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_fil
 
 
 if __name__ == '__main__':
-    _list = search_and_store('banana', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Features.Subtitles.value, Duration.Short.value)
+    _list = search_and_store('banana', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Duration.Short.value, [Features.Subtitles.value])
     print('--- Search function ---')
     for link in _list:
         print(f'Video: {link}')

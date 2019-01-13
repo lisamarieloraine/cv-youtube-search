@@ -165,7 +165,7 @@ class CNN:
                         opt, acc, loss = sess.run([optimizer, accuracy, cost])
                         train_loss += loss
                         train_accuracy += acc
-                        print("Processed image", n)
+                        #print("Processed batch", n)
                         n += 1
                 except tf.errors.OutOfRangeError:
                     pass
