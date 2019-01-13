@@ -1,140 +1,114 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Dec 24 11:18:07 2018
-
-@author: plagl
-"""
-
 import os
 import coco
 import json
 import tensorflow as tf
+from PIL import Image  # uses pillow
 
 class Data:
-    def __init__(self, annotation_dir, annotation_name, image_dir):
+    def __init__(self, annotation_dir,klasses,img_path_train, img_path_val ):
         
         self.ann_dir = annotation_dir
-        self.img_dir = image_dir
+        self.klasses = klasses
         
         # load dataset
         os.chdir( self.ann_dir )
-        retval = os.getcwd()
-        print("Directory changed successfully:", retval)
-        self.API = coco.COCO(annotation_name)
-        
-    
-    def create_dict(self, file_name_info, file_name_anns):
-        ann_ids = self.API.getAnnIds(imgIds=[], catIds=[], areaRng=[], iscrowd=False)
-        anns = self.API.loadAnns(ann_ids)
-        img_ids = [a.get('image_id') for a in anns]
-        info = self.API.loadImgs(img_ids)
-        images = dict()
-        
-        # getting categories and image ids of unique images
-        for ann in anns:
-            if 'category_id' in ann.keys() and ann.get('image_id') not in images.keys():
-                images[ann.get('image_id')] = [ann.get('category_id')]       
-        for i in info:
-            if i.get('file_name') not in images[i.get('id')]:
-                images[i.get('id')].append(i.get('file_name'))       
+        self.API = coco.COCO('instances_train2017.json')
+        self.img_dir = img_path_train
+        self.data_train = self.select_images(klasses,581929)
+        self.img_dir = img_path_val
+        os.chdir( self.ann_dir )
+        self.API = coco.COCO('instances_val2017.json')
+        self.data_val = self.select_images(klasses,198806)
 
-        return images
-    
-    
-    def convert_dict(self, images, file_name):
-        print('converting labels...') 
-        apple = self.API.getCatIds(catNms=['apple'])[0]
-        banana = self.API.getCatIds(catNms=['banana'])[0]
-        broccoli = self.API.getCatIds(catNms=['broccoli'])[0]
-        (other, apples, bananas, broccolis) = (-1,0,1,2)
-        counts = [0,0,0,0]
+    def write_data(self):
+        os.chdir(self.ann_dir)
         
-        for key, value in images.items():
-            if not len(value) == 2:
-                print('Warning: not all info available for image', key)
-            if not type(value[0]) == int:
-                print('Warning: category is of wrong type for image', key)
-            if not type(value[1]) == str:
-                print('Warning: file name is of wrong type for image', key)
-                
-            if value[0] == apple:
-                value[0] = apples
-                counts[1] += 1
-            elif value[0] == banana:
-                value[0] = bananas
-                counts[2] += 1
-            elif value[0] == broccoli:
-                value[0] = broccolis
-                counts[3] += 1
-            else:
-                value[0] = other
-                counts[0] += 1
-                     
-        # Save to json file
-        with open(file_name, 'w') as fp:
-            json.dump(images, fp)
-        print('saved annotations to json file:', file_name)  
-        print(counts)
-        return images, counts
-    
-    
-
-    def subset_images(self, images, counts):
-        max_examples = max(counts[1:])
-        labels = [i[0] for i in images.values()]
-        file_names = [i[1] for i in images.values()]
-        to_remove = counts[0] - max_examples
-        remove_count = 0
+        with open('data_train.txt', 'w') as filehandle:  
+            json.dump(self.data_train, filehandle)
         
-        subset_labels = []
-        subset_files = []
+        with open('data_val.txt', 'w') as filehandle:  
+            json.dump(self.data_val, filehandle)
 
-        for index, label in enumerate(labels):
-            if label == -1 and remove_count < to_remove:
-                remove_count += 1
-            else:
-                subset_labels.append(labels[index])
-                subset_files.append(file_names[index])
+    def get_cat(self,catnms):
+        return self.API.getCatIds(catNms=catnms)
     
-        print("Number of examples BEFORE subsetting:", len(labels))
-        print("Number of examples AFTER subsetting:", len(subset_labels))
+    def get_ids(self,catNms):
+        return self.API.getImgIds(catIds = catNms)
+    
+    def get_imgs(self,ids):
+        return self.API.loadImgs(ids)
 
-        # Save to json files
-        #with open(file_name_ann, 'w') as fp:
-            #json.dump(labels, fp)
-        #with open(file_name_info, 'w') as fp:
-            #json.dump(file_names, fp)
-        return subset_labels, subset_files
-            
-         
-    def create_dataset(self, files, labels, batch_size):        
-        # Reads an image from a file, decodes it into a dense tensor, and resizes it
-        # to a fixed shape.
-        def _parse_function(filename, label):
-          image_string = tf.read_file(filename)
-          image_decoded = tf.image.decode_jpeg(image_string, channels=1)
-          image_resized = tf.image.resize_images(image_decoded, [28, 28])
-          return image_resized, label
-       #ValueError: Shape must be rank 0 but is rank 1 for 'ReadFile' (op: 'ReadFile') with input shapes: [?].
-        print('creating datasets...')
-        # A vector of filenames.
-        filenames = tf.constant(files)
-
-        # `labels[i]` is the label for the image in `filenames[i].
-        classes = tf.constant(labels)
-        
-        #might improve efficiency for large datasets
-        #placeholder_X = tf.placeholder(filenames_train.dtype, filenames_train.shape)
-        #placeholder_y = tf.placeholder(labels_train.dtype, labels_train.shape)
-        
-        # Create separate Datasets for training and validation
+    def prominent(self,imgids,catids):  #check if our object is prominent enough in the picture
+        annIds = self.API.getAnnIds(imgIds=imgids,catIds=catids,iscrowd=False)
+        ann = self.API.loadAnns(annIds)
+        area = 0
+        for item in ann:
+            area += item['area']
         os.chdir( self.img_dir )
-        dataset = tf.data.Dataset.from_tensor_slices((filenames, classes))
-        dataset = dataset.map(_parse_function).batch(batch_size)
-        print('dataset created!')
+        image_name = self.get_imgs(imgids)[0]['file_name']
+        im = Image.open(image_name)
+        size_image = im.size[0]*im.size[1]
+        size = size_image * 0.2
+
+        if area < size:
+            return False
+        else:
+            return True
         
-        return dataset      
+    def select_images(self,klasses,limit_id):
+        data_images = []
+        for klasse in klasses:
+            cat_lst = self.get_cat(klasse[0])
+            id_lst = self.get_ids(cat_lst)
+            imgs = self.get_imgs(id_lst)
             
+            for item in imgs:
+                if item['id'] < limit_id and self.prominent(item['id'],cat_lst):
+                    data_images.append((item['file_name'],klasse[1]))
+        return data_images
+            
+
+    
+def create_dataset(data, batch_size,img_dir):#files is list of filenames, labels contains integer label in order
+#def create_dataset(self, data_jpg, batch_size):
+    # Reads an image from a file, decodes it into a dense tensor, and resizes it
+    # to a fixed shape.
+    def _parse_function(filename, label):
+      image_string = tf.read_file(filename)
+      image_decoded = tf.image.decode_jpeg(image_string, channels=1)
+      image_resized = tf.image.resize_images(image_decoded, [28, 28])
+      return image_resized, label
+  
+    def split_filenames(data_non_splitted):
+        jpg_list = []
+        labels_list = []
+        for element in data_non_splitted:
+            jpg_list.append(element[0])
+            labels_list.append(element[1])
+        return jpg_list,labels_list
+    
+    file_names,labels = split_filenames(data)
+
+   #ValueError: Shape must be rank 0 but is rank 1 for 'ReadFile' (op: 'ReadFile') with input shapes: [?].
+    print('creating datasets...')
+    # A vector of filenames.
+    
+    filenames = tf.constant(file_names)
+
+    # `labels[i] is the label for the image in filenames[i].
+    classes = tf.constant(labels)
+    
+    #might improve efficiency for large datasets
+    #placeholder_X = tf.placeholder(filenames_train.dtype, filenames_train.shape)
+    #placeholder_y = tf.placeholder(labels_train.dtype, labels_train.shape)
+    
+    # Create separate Datasets for training and validation
+    os.chdir( img_dir )
+    dataset = tf.data.Dataset.from_tensor_slices((filenames, classes))
+    dataset = dataset.map(_parse_function).batch(batch_size)
+    print('dataset created!')
+    
+    return dataset,labels      
             
             
             

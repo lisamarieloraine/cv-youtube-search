@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Dec 22 21:08:26 2018
-
-@author: plagl
-"""
-
 import json
 import time
 import matplotlib.pyplot as plt
@@ -13,7 +6,6 @@ from matplotlib.patches import Polygon
 import numpy as np
 import copy
 import itertools
-#from . import mask as maskUtils
 import os
 from collections import defaultdict
 import sys
@@ -30,6 +22,7 @@ def _isArrayLike(obj):
 
 class COCO:
     def __init__(self, annotation_file=None):
+        
         """
         Constructor of Microsoft COCO helper class for reading and visualizing annotations.
         :param annotation_file (str): location of annotation file
@@ -47,6 +40,8 @@ class COCO:
             print('Done (t={:0.2f}s)'.format(time.time()- tic))
             self.dataset = dataset
             self.createIndex()
+            
+            
 
     def createIndex(self):
         # create index
@@ -393,3 +388,16 @@ class COCO:
         rle = self.annToRLE(ann)
         m = maskUtils.decode(rle)
         return m
+        
+    def encode(bimask):
+        if len(bimask.shape) == 3:
+            return _mask.encode(bimask)
+        elif len(bimask.shape) == 2:
+            h, w = bimask.shape
+            return _mask.encode(bimask.reshape((h, w, 1), order='F'))[0]  
+        
+    def area(rleObjs):
+        if type(rleObjs) == list:
+            return _mask.area(rleObjs)
+        else:
+            return _mask.area([rleObjs])[0]
