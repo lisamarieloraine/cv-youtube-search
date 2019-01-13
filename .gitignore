@@ -6,3 +6,4 @@ out/
 .class
 .spyproject/
 __pycache__/
+path.py
