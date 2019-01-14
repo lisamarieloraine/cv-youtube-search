@@ -48,7 +48,7 @@ class Data:
         image_name = self.get_imgs(imgids)[0]['file_name']
         im = Image.open(image_name)
         size_image = im.size[0]*im.size[1]
-        size = size_image * 0.1
+        size = size_image * 0.2
 
         if area < size:
             return False
@@ -75,9 +75,10 @@ def create_dataset(data, batch_size,img_dir):#files is list of filenames, labels
     # to a fixed shape.
     def _parse_function(filename, label):
       image_string = tf.read_file(filename)
-      image_decoded = tf.image.decode_jpeg(image_string, channels=3)
+      image_decoded = tf.image.decode_jpeg(image_string, channels=1)
       image_resized = tf.image.resize_images(image_decoded, [32,32])
-      return image_resized, label
+      image_normalized = tf.image.per_image_standardization(image_resized)
+      return image_normalized, label
   
     def split_filenames(data_non_splitted):
         jpg_list = []
@@ -87,6 +88,7 @@ def create_dataset(data, batch_size,img_dir):#files is list of filenames, labels
             labels_list.append(element[1])
         return jpg_list,labels_list
     
+    print("building dataset")
     file_names,labels = split_filenames(data)
 
    #ValueError: Shape must be rank 0 but is rank 1 for 'ReadFile' (op: 'ReadFile') with input shapes: [?].
@@ -105,7 +107,7 @@ def create_dataset(data, batch_size,img_dir):#files is list of filenames, labels
     os.chdir( img_dir )
     dataset = tf.data.Dataset.from_tensor_slices((filenames, classes))
     dataset = dataset.map(_parse_function).batch(batch_size)
-    
+    print("dataset build")
     return dataset,labels      
             
             
