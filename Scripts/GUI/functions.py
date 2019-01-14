@@ -104,10 +104,11 @@ def clear_window():
 # #     #         pass
 
 
-def print_URL(entry):
-    print(search_and_store(entry.get(), 'x'))
+def print_URL(entry, show_entry_func):
     print('Search')
-    print(search_and_store(entry.get(), 'unused', SORTBY, UPLOADDATE, DURATION, FEATURES))
+    list = search_and_store(entry.get(), 'unused', SORTBY, UPLOADDATE, DURATION, FEATURES)
+    print(list)
+    show_entry_func(list)
 
 # Description: Sets the global variable SORTBY everytime the combobox is updated
 def sort_combo_func(event=None):

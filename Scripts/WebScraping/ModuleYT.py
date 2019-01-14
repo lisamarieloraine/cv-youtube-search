@@ -57,7 +57,7 @@ def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_fil
     print(f'Using filter search term: {formatted_search_term}')
 
     youtube_url = f'https://www.youtube.com/results?{_sortby_filter}search_query={formatted_search_term}'
-    print(youtube_url)
+    # print(youtube_url)
     return import_youtube_data(youtube_url)
 
 
