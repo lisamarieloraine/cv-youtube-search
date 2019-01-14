@@ -30,7 +30,7 @@ class CNN:
         
         #set up dictionaries for the structure of the weight and bias terms
         self.weights = {
-        'wc1': tf.get_variable('w0', shape=(3,3,1,32), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc1': tf.get_variable('w0', shape=(3,3,3,32), initializer=tf.contrib.layers.xavier_initializer()), 
         'wc2': tf.get_variable('w1', shape=(3,3,32,64), initializer=tf.contrib.layers.xavier_initializer()), 
         'wc3': tf.get_variable('w2', shape=(3,3,64,128), initializer=tf.contrib.layers.xavier_initializer()), 
         'wd1': tf.get_variable('w3', shape=(4*4*128,128), initializer=tf.contrib.layers.xavier_initializer()), 
@@ -84,22 +84,28 @@ class CNN:
         return tf.nn.max_pool(x, ksize=[1, k, k, 1], strides=[1, k, k, 1],padding='SAME')
     
     
-    def conv_net(self, x):  
-        # here we call the conv2d function we had defined above and pass the input image x, weights wc1 and bias bc1.
+    def conv_net(self, x,train = True):  
+        #set train to false to remove dropouts
+        #problem: dropouts also active when validating 
+        # here we call the conv2d function we had defined above and pass the input image x, weights wc1 and bias bc1
+        x = tf.layers.dropout(x) #add to reduce overfitting
         conv1 = self.conv2d(x, self.weights['wc1'], self.biases['bc1'])
         # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 14*14 matrix.
         conv1 = self.maxpool2d(conv1, k=2)
-        
+        if train == True:
+            conv1 = tf.layers.dropout(conv1)
         # Convolution Layer
         # here we call the conv2d function we had defined above and pass the input image x, weights wc2 and bias bc2.
         conv2 = self.conv2d(conv1, self.weights['wc2'], self.biases['bc2'])
         # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 7*7 matrix.
         conv2 = self.maxpool2d(conv2, k=2)
-    
+        if train == True:
+            conv2 = tf.layers.dropout(conv2)
         conv3 = self.conv2d(conv2,self.weights['wc3'], self.biases['bc3'])
         # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 4*4.
         conv3 = self.maxpool2d(conv3, k=2)
-    
+        if train == True:
+            conv3 = tf.layers.dropout(conv3)
         # Fully connected layer
         # Reshape conv2 output to fit fully connected layer input
         fc1 = tf.reshape(conv3, [-1, self.weights['wd1'].get_shape().as_list()[0]])
@@ -156,7 +162,6 @@ class CNN:
                 val_loss, val_accuracy = 0, 0
                 
                 # Start train iterator
-                print("Running training session...")
                 os.chdir( self.img_dir_train )
                 sess.run(train_iterator)
                 n = 1
@@ -171,7 +176,6 @@ class CNN:
                     pass
                 
                 # Start validation iterator
-                print("Running validation session...")
                 os.chdir( self.img_dir_val )
                 sess.run(val_iterator)
                 try:
@@ -182,11 +186,13 @@ class CNN:
                 except tf.errors.OutOfRangeError:
                     pass
         
-                print('\nEpoch: {}'.format(i + 1))
-                print('Train accuracy: {:.4f}, loss: {:.4f}'.format(train_accuracy / size_train,
-                                                                     train_loss / size_train))
-                print('Val accuracy: {:.4f}, loss: {:.4f}\n'.format(val_accuracy / size_val, 
-                                                                    val_loss / size_val))
+# =============================================================================
+#                 print('\nEpoch: {}'.format(i + 1))
+#                 print('Train accuracy: {:.4f}, loss: {:.4f}'.format(train_accuracy / size_train,
+#                                                                      train_loss / size_train))
+#                 print('Val accuracy: {:.4f}, loss: {:.4f}\n'.format(val_accuracy / size_val, 
+#                                                                     val_loss / size_val))
+# =============================================================================
 
 
                 # Append data of current epoch
@@ -198,8 +204,5 @@ class CNN:
             summary_writer.close()
         return train_losses, train_accuracies, val_losses, val_accuracies
     
-
-
-
 
 
