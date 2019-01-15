@@ -1,13 +1,13 @@
 from tkinter import *
 import Scripts.GUI.functions as funcs
 from Scripts.GUI.page_search import PageSearch
+from Scripts.GUI.page_webcam_search import PageWebcamSearch
 from tkinter import filedialog
 
 main_bg_colour = '#e1c793'
 main_button_colour = '#ead7b2'
 main_font = 'Comfortaa'
 side_bar_colour = '#e5cfa3'
-
 
 class Homepage(Frame):
     def __init__(self, parent, controller):
@@ -20,7 +20,8 @@ class Homepage(Frame):
         self.take_picture_button = Button(self,
                                           text='Take picture',
                                           bg=main_button_colour,
-                                          font=main_font)
+                                          font=main_font,
+                                          command=lambda: controller.show_frame(PageWebcamSearch))
 
 
 

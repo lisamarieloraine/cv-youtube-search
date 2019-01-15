@@ -16,7 +16,7 @@ main_font = 'Comfortaa'
 side_bar_colour = '#e5cfa3'
 
 
-class PageSearch(Frame):
+class PageWebcamSearch(Frame):
     _image = []
     _thumbnail_list =[]
 
@@ -31,8 +31,8 @@ class PageSearch(Frame):
         self.side_bar = Frame(self, height=600,
                               width=200,
                               bg=side_bar_colour)
-
-        self.search_term_label = Label(self, text='Search term',
+        self.input_searchterm = "output_CNN"
+        self.search_term_label = Label(self, text= self.input_searchterm,
                                        font=(main_font, 15),
                                        bg=side_bar_colour)
 
@@ -108,14 +108,11 @@ class PageSearch(Frame):
                                   font=(main_font, 25),
                                   bg=main_bg_colour)
 
-        self.input_searchterm = Entry(self,
-                                      width=18,
-                                      font=(main_font, 11),
-                                      textvariable=StringVar)
 
-        self.search_button = Button(self,
+
+        self.search_button = Button(self, text="Search",
                                     height=1,
-                                    width=3,
+                                    width=10,
                                     bg=main_button_colour,
                                     command=lambda: funcs.print_URL(self.input_searchterm, self.show_thumbnails))
 
@@ -172,11 +169,8 @@ class PageSearch(Frame):
         self.result_label.place(x=250,
                                 y=10)
 
-        self.input_searchterm.place(x=250,
-                                    y=80)
-
-        self.search_button.place(x=430,
-                                 y=80)
+        self.search_button.place(x=20,
+                                 y=400)
 
 
     def show_thumbnails(self, _link_list):
@@ -212,6 +206,3 @@ class PageSearch(Frame):
 
             self._image.append(image)
             self._thumbnail_list.append(thumbnail_button)
-
-
-
