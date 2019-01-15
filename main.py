@@ -38,22 +38,22 @@ with open('data_val.txt', 'r') as filehandle:
 #thats why i split the train set into a new train set and a validation set
 data_shuffle = data_train   
 random.shuffle(data_shuffle)
-data_val = data_shuffle[0:200]
-data_train = data_shuffle[200:]
+data_val = data_shuffle[0:150]
+data_train = data_shuffle[150:]
 img_path_val = img_path_train  
 
 
     
 # Set up the neural network
-training_iters = 20
+training_iters = 15
 learning_rate = 0.001 
 #0.001 or 0.0001 are best but overfitting is an issue
 batch_size = 1 #seems to have a big influence, not sure whats wrong if i increase
-n_input = 32
+n_input = 64
 n_classes = 2
-
-dataset_train,labels_train = data.create_dataset(data_train,batch_size,img_path_train)
-dataset_val,labels_val = data.create_dataset(data_val,batch_size,img_path_val)
+print("learning rate",learning_rate)
+dataset_train,labels_train = data.create_dataset(data_train,batch_size,img_path_train,n_input)
+dataset_val,labels_val = data.create_dataset(data_val,batch_size,img_path_val,n_input)
 
 network = network.CNN(training_iters, learning_rate, batch_size, n_input, \
               n_classes, img_path_train, img_path_val)
