@@ -1,4 +1,5 @@
 import io
+import webbrowser
 from tkinter import *
 import Scripts.GUI.functions as funcs
 from tkinter import ttk
@@ -15,6 +16,7 @@ side_bar_colour = '#e5cfa3'
 
 class PageSearch(Frame):
     _image = []
+    _lambda_list =[]
 
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -101,6 +103,7 @@ class PageSearch(Frame):
         self.search_button = Button(self,
                                     command=lambda: funcs.print_URL(self.input_searchterm, self.show_thumbnails))
 
+
         # Place elements
 
         self.search_term_label.place(x=10,
@@ -154,20 +157,35 @@ class PageSearch(Frame):
         self.search_button.place(x=450,
                                  y=100)
 
+
     def show_thumbnails(self, _link_list):
         print('Converting url to image')
         # Thumbnail image
+        def open_url(url):
+            return lambda x: webbrowser.open_new(url)
+
+        w = 150
+        h = 80
+
         for i, url in enumerate(_link_list):
-            if i == 10:
+            if i == 15:
                 break
             thumbnail_url = get_thumbnail(url)
             print(thumbnail_url)
             response = get_verified_response(thumbnail_url)
             im = Image.open(io.BytesIO(response.data))
+            im = im.resize((w, h), Image.ANTIALIAS)
             image = ImageTk.PhotoImage(im)
 
-            label1 = Label(self, image=image)
-            label1.place(x=220,
-                         y=150+i*50)
+
+            label1 = Button(self, image=image,
+                                     width=w,
+                                     height=h)
+            label1.place(x=220 +(0 if i<5 else (1.1*w if i<10 else 2.2*w)),
+                         y=150+(i % 5)*(h*1.1))
+            # self._lambda_list.append(lambda x: webbrowser.open_new(_link_list[i]))
+            label1.bind("<Button-1>", open_url(url))
 
             self._image.append(image)
+
+

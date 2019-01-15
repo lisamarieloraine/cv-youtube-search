@@ -137,3 +137,4 @@ def duration_combo_func(event=None):
     global DURATION
     DURATION = DURATION_DICT[event.widget.get()]
     print(f'event.widget: {event.widget.get()}')
+
