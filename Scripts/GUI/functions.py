@@ -108,9 +108,9 @@ def show_main_window():
 # #     #         pass
 
 
-def print_URL(entry, show_entry_func):
+def print_URL(string, show_entry_func):
     print('Search')
-    list = search_and_store(entry.get(), 'unused', SORTBY, UPLOADDATE, DURATION, FEATURES)
+    list = search_and_store(string, 'unused', SORTBY, UPLOADDATE, DURATION, FEATURES)
     print(list)
     show_entry_func(list)
 

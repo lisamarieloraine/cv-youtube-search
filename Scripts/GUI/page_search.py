@@ -117,7 +117,7 @@ class PageSearch(Frame):
                                     height=1,
                                     width=3,
                                     bg=main_button_colour,
-                                    command=lambda: funcs.print_URL(self.input_searchterm, self.show_thumbnails))
+                                    command=lambda: funcs.print_URL(self.input_searchterm.get(), self.show_thumbnails))
 
 
         # self.search_picture = PhotoImage(file = 'C:\\Users\Daniek\Afbeeding1.png')

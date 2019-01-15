@@ -31,7 +31,7 @@ class PageWebcamSearch(Frame):
         self.side_bar = Frame(self, height=600,
                               width=200,
                               bg=side_bar_colour)
-        self.input_searchterm = "output_CNN"
+        self.input_searchterm = "bananas" #TODO: this is the output of the CNN
         self.search_term_label = Label(self, text= self.input_searchterm,
                                        font=(main_font, 15),
                                        bg=side_bar_colour)
@@ -117,7 +117,7 @@ class PageWebcamSearch(Frame):
                                     command=lambda: funcs.print_URL(self.input_searchterm, self.show_thumbnails))
 
 
-        # self.search_picture = PhotoImage(file = 'C:\\Users\Daniek\Afbeeding1.png')
+        # self.search_picture = PhotoImage(file = 'C:\\Users\Daniek\Afbeelding1.png')
         # self.search_button.config(image = search_picture)
 
 
