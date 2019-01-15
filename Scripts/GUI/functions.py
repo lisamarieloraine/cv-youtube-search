@@ -55,6 +55,10 @@ def clear_window():
                          bg=main_bg_colour)
     empty_window.place(x=0,
                        y=0)
+
+def show_main_window():
+    clear_window()
+    self.main_window()
 #
 # # def show_main_window():
 # #     clear_window()
@@ -104,9 +108,9 @@ def clear_window():
 # #     #         pass
 
 
-def print_URL(entry, show_entry_func):
+def print_URL(string, show_entry_func):
     print('Search')
-    list = search_and_store(entry.get(), 'unused', SORTBY, UPLOADDATE, DURATION, FEATURES)
+    list = search_and_store(string, 'unused', SORTBY, UPLOADDATE, DURATION, FEATURES)
     print(list)
     show_entry_func(list)
 
@@ -137,3 +141,4 @@ def duration_combo_func(event=None):
     global DURATION
     DURATION = DURATION_DICT[event.widget.get()]
     print(f'event.widget: {event.widget.get()}')
+

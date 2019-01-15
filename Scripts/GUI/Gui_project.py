@@ -1,6 +1,7 @@
 from tkinter import *
 from Scripts.GUI.Homepage import Homepage
 from Scripts.GUI.page_search import PageSearch
+from Scripts.GUI.page_webcam_search import PageWebcamSearch
 from tkinter import messagebox #To be able to have pop up message
 from tkinter import filedialog
 from tkinter import ttk
@@ -34,7 +35,7 @@ class GUI(Tk):
         #Building Frames
         self.frames = {}
 
-        for F in (Homepage, PageSearch):
+        for F in (Homepage, PageSearch, PageWebcamSearch):
             frame = F(container, self)
             self.frames[F] = frame
 
