@@ -48,7 +48,7 @@ class Data:
         image_name = self.get_imgs(imgids)[0]['file_name']
         im = Image.open(image_name)
         size_image = im.size[0]*im.size[1]
-        size = size_image * 0.2
+        size = size_image * 0.15
 
         if area < size:
             return False
@@ -69,14 +69,14 @@ class Data:
             
 
     
-def create_dataset(data, batch_size,img_dir):#files is list of filenames, labels contains integer label in order
+def create_dataset(data, batch_size,img_dir,res):#files is list of filenames, labels contains integer label in order
 #def create_dataset(self, data_jpg, batch_size):
     # Reads an image from a file, decodes it into a dense tensor, and resizes it
     # to a fixed shape.
     def _parse_function(filename, label):
       image_string = tf.read_file(filename)
-      image_decoded = tf.image.decode_jpeg(image_string, channels=1)
-      image_resized = tf.image.resize_images(image_decoded, [32,32])
+      image_decoded = tf.image.decode_jpeg(image_string, channels=3)
+      image_resized = tf.image.resize_images(image_decoded, [res,res])
       image_normalized = tf.image.per_image_standardization(image_resized)
       return image_normalized, label
   
@@ -108,7 +108,7 @@ def create_dataset(data, batch_size,img_dir):#files is list of filenames, labels
     dataset = tf.data.Dataset.from_tensor_slices((filenames, classes))
     dataset = dataset.map(_parse_function).batch(batch_size)
     print("dataset build")
-    return dataset,labels      
+    return dataset,labels  
             
             
             

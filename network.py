@@ -31,14 +31,15 @@ class CNN:
         #set up dictionaries for the structure of the weight and bias terms
         self.weights = {
         'wc1': tf.get_variable('w0', shape=(3,3,3,32), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc2': tf.get_variable('w1', shape=(3,3,32,64), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc3': tf.get_variable('w2', shape=(3,3,64,128), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc1_1' :tf.get_variable('w1_1', shape=(3,3,32,32), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc2': tf.get_variable('w1', shape=(3,3,32,96), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc3': tf.get_variable('w2', shape=(3,3,96,128), initializer=tf.contrib.layers.xavier_initializer()), 
         'wd1': tf.get_variable('w3', shape=(4*4*128,128), initializer=tf.contrib.layers.xavier_initializer()), 
         'out': tf.get_variable('w6', shape=(128,n_classes), initializer=tf.contrib.layers.xavier_initializer()), 
         }
         self.biases = {
             'bc1': tf.get_variable('b0', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
-            'bc2': tf.get_variable('b1', shape=(64), initializer=tf.contrib.layers.xavier_initializer()),
+            'bc2': tf.get_variable('b1', shape=(96), initializer=tf.contrib.layers.xavier_initializer()),
             'bc3': tf.get_variable('b2', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
             'bd1': tf.get_variable('b3', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
             'out': tf.get_variable('b4', shape=(n_classes), initializer=tf.contrib.layers.xavier_initializer()),
@@ -64,7 +65,7 @@ class CNN:
         plt.plot(range(len(test_accuracy)), test_accuracy, 'r', label='Test Accuracy')
         plt.title('Training and Test Accuracy')
         plt.xlabel('Epochs ',fontsize=16)
-        plt.ylabel('Loss',fontsize=16)
+        plt.ylabel('Accuracy',fontsize=16)
         plt.legend()
         plt.figure()
         plt.show()
@@ -84,34 +85,37 @@ class CNN:
         return tf.nn.max_pool(x, ksize=[1, k, k, 1], strides=[1, k, k, 1],padding='SAME')
     
     
-    def conv_net(self, x,train = True):  
+    def conv_net(self, x,train = False):  
         #set train to false to remove dropouts
         #problem: dropouts also active when validating 
         # here we call the conv2d function we had defined above and pass the input image x, weights wc1 and bias bc1
         x = tf.layers.dropout(x) #add to reduce overfitting
         conv1 = self.conv2d(x, self.weights['wc1'], self.biases['bc1'])
         # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 14*14 matrix.
+        conv1 = self.conv2d(conv1,self.weights['wc1_1'], self.biases['bc1'])
+        conv1 = self.conv2d(conv1,self.weights['wc1_1'], self.biases['bc1'])
         conv1 = self.maxpool2d(conv1, k=2)
-        if train == True:
-            conv1 = tf.layers.dropout(conv1)
+     
+        conv1 = tf.layers.dropout(conv1,rate = 0.2,training = train)
         # Convolution Layer
         # here we call the conv2d function we had defined above and pass the input image x, weights wc2 and bias bc2.
         conv2 = self.conv2d(conv1, self.weights['wc2'], self.biases['bc2'])
         # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 7*7 matrix.
         conv2 = self.maxpool2d(conv2, k=2)
-        if train == True:
-            conv2 = tf.layers.dropout(conv2)
+
+        conv2 = tf.layers.dropout(conv2,rate = 0.2,training = train)
         conv3 = self.conv2d(conv2,self.weights['wc3'], self.biases['bc3'])
         # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 4*4.
         conv3 = self.maxpool2d(conv3, k=2)
-        if train == True:
-            conv3 = tf.layers.dropout(conv3)
+
+        conv3 = tf.layers.dropout(conv3,rate = 0.2,training = train)
         # Fully connected layer
         # Reshape conv2 output to fit fully connected layer input
         fc1 = tf.reshape(conv3, [-1, self.weights['wd1'].get_shape().as_list()[0]])
         fc1 = tf.add(tf.matmul(fc1, self.weights['wd1']), self.biases['bd1'])
         fc1 = tf.nn.relu(fc1)
-
+        
+        fc1 = tf.layers.dropout(fc1,rate = 0.5,training = train)
         # Output, class prediction
         # finally we multiply the fully connected layer with the weights and add a bias term. 
         out = tf.add(tf.matmul(fc1, self.weights['out']), self.biases['out'])
@@ -119,9 +123,11 @@ class CNN:
     
     
     def operations(self, x, y):
-        pred = self.conv_net(x)
-        cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
-        optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(cost)
+        pred = self.conv_net(x,False)
+        cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=pred, labels=y))
+        pred_dropout = self.conv_net(x,True)
+        cost_optimizer = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=pred_dropout, labels=y))
+        optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(cost_optimizer)
     
         #Here you check whether the index of the maximum value of the predicted image is equal to the actual labelled image. and both will be a column vector.
         correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
@@ -162,6 +168,7 @@ class CNN:
                 val_loss, val_accuracy = 0, 0
                 
                 # Start train iterator
+                
                 os.chdir( self.img_dir_train )
                 sess.run(train_iterator)
                 n = 1
@@ -185,6 +192,7 @@ class CNN:
                         val_accuracy += acc
                 except tf.errors.OutOfRangeError:
                     pass
+                    
         
 # =============================================================================
 #                 print('\nEpoch: {}'.format(i + 1))
