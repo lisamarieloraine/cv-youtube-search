@@ -47,7 +47,7 @@ class GUI(Tk):
 
 
     def show_frame(self, cont):
-        frame= self.frames[cont]
+        frame = self.frames[cont]
         frame.tkraise()
         frame.update()
 
