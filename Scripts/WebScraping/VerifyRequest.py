@@ -17,3 +17,8 @@ def get_verified_response(_url):
         return requests
     except Exception:
         return None
+
+
+if __name__ == "__main__":
+    response = get_verified_response('https://img.youtube.com/vi/yjMyTDS54HQ/maxresdefault.jpg')
+    print(response.status)

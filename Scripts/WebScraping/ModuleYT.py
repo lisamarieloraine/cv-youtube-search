@@ -29,6 +29,8 @@ def import_youtube_data(_youtube_url):
     response = get_verified_response(_youtube_url)  # Get server response from url request
     soup = BeautifulSoup(response.data, 'html.parser')
     for vid in soup.findAll('a', attrs={'class': 'yt-uix-tile-link'}):  # Find all <a> tags on page
+        if get_verified_response(get_thumbnail('https://www.youtube.com' + vid['href'])).status != 200:
+            continue
         result.append('https://www.youtube.com' + vid['href'])  # Extracting web links using 'href' property
     return filter_watch_only(result)
 
@@ -57,7 +59,7 @@ def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_fil
     print(f'Using filter search term: {formatted_search_term}')
 
     youtube_url = f'https://www.youtube.com/results?{_sortby_filter}search_query={formatted_search_term}'
-    # print(youtube_url)
+    print(youtube_url)
     return import_youtube_data(youtube_url)
 
 
