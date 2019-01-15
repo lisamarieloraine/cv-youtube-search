@@ -7,6 +7,8 @@ from PIL import Image, ImageTk
 from Scripts.WebScraping.FilterTerms import Features
 from Scripts.WebScraping.VerifyRequest import get_verified_response
 from Scripts.WebScraping.PullThumbnail import get_thumbnail
+import Scripts.GUI.Homepage
+
 
 main_bg_colour = '#e1c793'
 main_button_colour = '#ead7b2'
@@ -14,15 +16,18 @@ main_font = 'Comfortaa'
 side_bar_colour = '#e5cfa3'
 
 
+
 class PageSearch(Frame):
     _image = []
-    _lambda_list =[]
+    _thumbnail_list =[]
 
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
 
         self.controller = controller
         self.config(background=main_bg_colour)
+
+
         # Build elements
         self.side_bar = Frame(self, height=600,
                               width=200,
@@ -35,14 +40,17 @@ class PageSearch(Frame):
         self.sort_by_label = Label(self, text='Sort by',
                                    font=(main_font, 10),
                                    bg=side_bar_colour)
+
         self.sort_combobox = ttk.Combobox(self, values=('Default', 'Relevance', 'Upload Time', 'View Count', 'Rating'),
                                           width=20,
                                           font=(main_font, 10))
+
         self.sort_combobox.bind('<<ComboboxSelected>>', funcs.sort_combo_func)
 
         self.upload_date_label = Label(self, text='Upload Date',
                                        font=(main_font, 10),
                                        bg=side_bar_colour)
+
         self.upload_date_combobox = ttk.Combobox(self, values=(
         'Default', 'Past hour', 'Today', 'This week ', 'This month', 'This year'),
                                                  width=20,
@@ -84,6 +92,7 @@ class PageSearch(Frame):
                                                     bg=side_bar_colour,
                                                     command=lambda: funcs.feature_func(Features.FourKResolution.value))
 
+
         self.HighDefinition_checkbox = Checkbutton(self,
                                                    text='High Definition',
                                                    width=20,
@@ -92,16 +101,29 @@ class PageSearch(Frame):
         self.go_back_button = Button(self,
                                      width=5,
                                      height=2,
-                                     bg=main_button_colour)
+                                     bg=main_button_colour,
+                                     command=lambda: controller.show_frame(Scripts.GUI.Homepage.Homepage))
+
         self.result_label = Label(self,
                                   text='Results',
                                   font=(main_font, 25),
                                   bg=main_bg_colour)
 
         self.input_searchterm = Entry(self,
+                                      width=18,
+                                      font=(main_font, 11),
                                       textvariable=StringVar)
+
         self.search_button = Button(self,
+                                    height=1,
+                                    width=3,
+                                    bg=main_button_colour,
                                     command=lambda: funcs.print_URL(self.input_searchterm, self.show_thumbnails))
+
+
+        # self.search_picture = PhotoImage(file = 'C:\\Users\Daniek\Afbeeding1.png')
+        # self.search_button.config(image = search_picture)
+
 
 
         # Place elements
@@ -148,14 +170,14 @@ class PageSearch(Frame):
         self.go_back_button.place(x=710,
                                   y=20)
 
-        self.result_label.place(x=300,
+        self.result_label.place(x=250,
                                 y=10)
 
-        self.input_searchterm.place(x=300,
-                                    y=100)
+        self.input_searchterm.place(x=250,
+                                    y=80)
 
-        self.search_button.place(x=450,
-                                 y=100)
+        self.search_button.place(x=430,
+                                 y=80)
 
 
     def show_thumbnails(self, _link_list):
@@ -166,6 +188,9 @@ class PageSearch(Frame):
 
         w = 150
         h = 80
+
+        # self._image.place_forget();
+        [button.place_forget() for button in self._thumbnail_list]
 
         for i, url in enumerate(_link_list):
             if i == 15:
@@ -178,14 +203,16 @@ class PageSearch(Frame):
             image = ImageTk.PhotoImage(im)
 
 
-            label1 = Button(self, image=image,
+            thumbnail_button = Button(self, image=image,
                                      width=w,
                                      height=h)
-            label1.place(x=220 +(0 if i<5 else (1.1*w if i<10 else 2.2*w)),
+            thumbnail_button.place(x=260 +(0 if i<5 else (1.1*w if i<10 else 2.2*w)),
                          y=150+(i % 5)*(h*1.1))
             # self._lambda_list.append(lambda x: webbrowser.open_new(_link_list[i]))
-            label1.bind("<Button-1>", open_url(url))
+            thumbnail_button.bind("<Button-1>", open_url(url))
 
             self._image.append(image)
+            self._thumbnail_list.append(thumbnail_button)
+
 
 

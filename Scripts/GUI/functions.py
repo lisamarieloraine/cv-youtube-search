@@ -55,6 +55,10 @@ def clear_window():
                          bg=main_bg_colour)
     empty_window.place(x=0,
                        y=0)
+
+def show_main_window():
+    clear_window()
+    self.main_window()
 #
 # # def show_main_window():
 # #     clear_window()
