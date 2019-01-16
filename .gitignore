@@ -1,9 +1,4 @@
-\.idea/
-/.metadata/
-bin/**
-out/
-.recommenders/
-.class
 .spyproject/
 __pycache__/
-path.py
+*.pyc
+paths.py
