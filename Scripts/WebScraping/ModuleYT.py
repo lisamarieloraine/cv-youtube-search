@@ -20,6 +20,18 @@ def filter_watch_only(_list):
     return result
 
 
+# @Description Filters hyper-links if they do not have thumbnails
+# @argument <class 'list'>
+# @return <class 'list'>
+def filter_thumbnail_only(_list):
+    """Returns list of filtered youtube hyper-links"""
+    result = list()
+    for href in _list:
+        if get_verified_response(get_thumbnail(href)).status == 200:
+            result.append(href)
+    return result
+
+
 # @Description Lists youtube response videos from given url
 # @argument <class 'string'>
 # @return <class 'list'>
@@ -27,12 +39,15 @@ def import_youtube_data(_youtube_url):
     """Returns list of urls from url response"""
     result = list()
     response = get_verified_response(_youtube_url)  # Get server response from url request
+    if response is None:
+        return result
     soup = BeautifulSoup(response.data, 'html.parser')
+
     for vid in soup.findAll('a', attrs={'class': 'yt-uix-tile-link'}):  # Find all <a> tags on page
-        if get_verified_response(get_thumbnail('https://www.youtube.com' + vid['href'])).status != 200:
-            continue
         result.append('https://www.youtube.com' + vid['href'])  # Extracting web links using 'href' property
-    return filter_watch_only(result)
+
+    result = filter_watch_only(result)
+    return filter_thumbnail_only(result)
 
 
 # @Description Concatenates Enum filter values to a valid string
