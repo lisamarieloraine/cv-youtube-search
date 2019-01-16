@@ -45,7 +45,7 @@ img_path_val = img_path_train
 
     
 # Set up the neural network
-training_iters = 15
+training_iters = 10
 learning_rate = 0.001 
 #0.001 or 0.0001 are best but overfitting is an issue
 batch_size = 1 #seems to have a big influence, not sure whats wrong if i increase
@@ -64,6 +64,8 @@ network.train(dataset_train,len(labels_train), dataset_val, len(labels_val))
 
 network.plot_loss(train_loss, val_loss)
 network.plot_accuracy(train_accuracy, val_accuracy)
+
+result = network.predict("D:\\cocoapi\\images\\test2017\\000000001410.jpg")
 
 
 

@@ -156,6 +156,8 @@ class CNN:
         # Initializing the variables and operations
         init = tf.global_variables_initializer()
         
+        saver = tf.train.Saver(max_to_keep=0)
+        
         with tf.Session() as sess:
             sess.run(init) 
             train_losses = []
@@ -192,8 +194,7 @@ class CNN:
                         val_accuracy += acc
                 except tf.errors.OutOfRangeError:
                     pass
-                    
-        
+                        
 # =============================================================================
 #                 print('\nEpoch: {}'.format(i + 1))
 #                 print('Train accuracy: {:.4f}, loss: {:.4f}'.format(train_accuracy / size_train,
@@ -202,15 +203,48 @@ class CNN:
 #                                                                     val_loss / size_val))
 # =============================================================================
 
-
                 # Append data of current epoch
+                print('\nEpoch: {}'.format(i + 1))
                 train_losses.append(train_loss / size_train)
                 val_losses.append(val_loss / size_val)
                 train_accuracies.append(train_accuracy / size_train)
                 val_accuracies.append(val_accuracy / size_val)
         
+        
+            saver.save(sess, './my-model', global_step=0)
+            summary_writer.add_meta_graph(tf.train.export_meta_graph(graph = sess.graph))
             summary_writer.close()
         return train_losses, train_accuracies, val_losses, val_accuracies
+    
+    
+    def predict(self, image_path):
+        filename, directory = os.path.split(image_path)
+        #os.chdir( self.img_dir_train )
+        
+        with tf.Session() as sess:
+            new_saver = tf.train.import_meta_graph('./my-model-0.meta')
+            new_saver.restore(sess, './my-model-0')
+            
+            # read given image
+            os.chdir( directory )
+            image_string = tf.read_file(filename)
+            image_decoded = tf.image.decode_jpeg(image_string, channels=3)
+            image_resized = tf.image.resize_images(image_decoded, [self.n_input,self.n_input])
+            image_normalized = tf.image.per_image_standardization(image_resized)
+            
+            # convert image
+            data = tf.data.Dataset.from_tensors(image_normalized).batch(1)
+            iterator = tf.data.Iterator.from_structure(data.output_types, data.output_shapes)
+            data_X = iterator.get_next()
+            init = iterator.make_initializer(data)
+            sess.run(init)
+            
+            # make prediction
+            pred = self.conv_net(data_X, False)
+            output = sess.run(pred)
+            print(output)
+            
+        return output
     
 
 
