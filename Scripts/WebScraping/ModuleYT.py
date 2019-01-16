@@ -15,7 +15,7 @@ def filter_watch_only(_list):
     result = list()
     pattern = compile('^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/watch.+$')
     for href in _list:
-        if pattern.match(href):
+        if type(href) is str and pattern.match(href):
             result.append(href)
     return result
 
