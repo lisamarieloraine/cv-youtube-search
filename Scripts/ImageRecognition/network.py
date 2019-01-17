@@ -9,6 +9,7 @@ Created on Wed Dec 12 14:47:15 2018
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import os
+import sys
 #os.environ["CUDA_VISIBLE_DEVICES"]="0" #for training on gpu
 
 
@@ -23,10 +24,6 @@ class CNN:
         self.n_classes = n_classes
         self.img_dir_train = img_dir_train
         self.img_dir_val = img_dir_val
-
-        #placeholders for images and labels
-        #self.placeholder_X = tf.placeholder(tf.float32, [None, n_inputs, n_inputs, 1])
-        #self.placeholder_y = tf.placeholder(tf.int32, [None])
         
         #set up dictionaries for the structure of the weight and bias terms
         self.weights = {
@@ -63,7 +60,7 @@ class CNN:
         }
     
     
-    def conv_net(self, x,train = False):  
+    def conv_net(self, x, train = False):  
 
         # here we call the conv2d function we had defined above and pass the input image x, weights wc1 and bias bc1
         conv1 = self.conv2d(x, self.weights['wc1_1'], self.biases['bc1_1'])
@@ -96,6 +93,7 @@ class CNN:
 #         fc2 = tf.nn.relu(fc2)
 #         fc2 = tf.layers.dropout(fc2,rate = 0.5,training = train)
 # =============================================================================
+        
         # Output, class prediction
         # finally we multiply the fully connected layer with the weights and add a bias term. 
         out = tf.add(tf.matmul(fc1, self.weights['out']), self.biases['out'])
@@ -154,7 +152,6 @@ class CNN:
         return optimizer, accuracy, cost
     
     
-    #def train(self, info_train, anns_train, info_val, anns_val):
     def train(self, train_dataset, size_train, val_dataset, size_val):
         # implements a reinitializable iterator
         # see https://medium.com/ymedialabs-innovation/how-to-use-dataset-and-iterators-in-tensorflow-with-code-samples-3bb98b6b74ab
@@ -180,23 +177,20 @@ class CNN:
             val_losses = []
             train_accuracies = []
             val_accuracies = []
-            summary_writer = tf.summary.FileWriter('./Output', sess.graph)
+
             for i in range(self.epochs):
                 train_loss, train_accuracy = 0, 0
                 val_loss, val_accuracy = 0, 0
                 
                 # Start train iterator
-                
                 os.chdir( self.img_dir_train )
                 sess.run(train_iterator)
-                n = 1
+
                 try:
                     while True:
                         opt, acc, loss = sess.run([optimizer, accuracy, cost])
                         train_loss += loss
                         train_accuracy += acc
-                        #print("Processed batch", n)
-                        n += 1
                 except tf.errors.OutOfRangeError:
                     pass
                 
@@ -210,20 +204,60 @@ class CNN:
                         val_accuracy += acc
                 except tf.errors.OutOfRangeError:
                     pass
-                    
-                
-                print('\nEpoch: {}'.format(i + 1),\
-                      'Train accuracy: {:.4f}, loss: {:.4f}'.format(train_accuracy / size_train,train_loss / size_train),\
-                      'Val accuracy: {:.4f}, loss: {:.4f}\n'.format(val_accuracy / size_val, val_loss / size_val))
-          
+
                 # Append data of current epoch
+                print('\nEpoch: {}'.format(i + 1))
                 train_losses.append(train_loss / size_train)
                 val_losses.append(val_loss / size_val)
                 train_accuracies.append(train_accuracy / size_train)
                 val_accuracies.append(val_accuracy / size_val)
         
-            summary_writer.close()
+            # Save the variables to disk.
+            saver = tf.train.Saver(max_to_keep=0)
+            path = os.path.join(sys.path[0], 'Models\cnn-version')
+            save_path = saver.save(sess, path, global_step=0)
+            print("Model saved in path: %s" % save_path)
+
         return train_losses, train_accuracies, val_losses, val_accuracies
+    
+    
+    
+    def predict(self, image_path):
+        # get directory of this script to load model
+        script_path = sys.path[0]
+        
+        # read given image
+        directory, filename = os.path.split(image_path)
+        os.chdir( directory )
+        image_string = tf.read_file(filename)
+        image_decoded = tf.image.decode_jpeg(image_string, channels=3)
+        image_resized = tf.image.resize_images(image_decoded, [self.n_input,self.n_input])
+        image_normalized = tf.image.per_image_standardization(image_resized)
+        
+        # convert image to tensorflow dataset
+        data = tf.data.Dataset.from_tensors(image_normalized).batch(1)
+        iterator = tf.data.Iterator.from_structure(data.output_types, data.output_shapes)
+        data_X = iterator.get_next()
+        data_init = iterator.make_initializer(data)
+        os.chdir( script_path )
+        
+        # Add ops to save and restore all the variables.
+        saver = tf.train.Saver()
+        
+        with tf.Session() as sess:
+            # restoring the trained model
+            saver.restore(sess, './Models/cnn-version-0')
+            os.chdir( directory )
+            sess.run(data_init)
+            try:
+                while True:
+                    # make prediction
+                    pred = self.conv_net(data_X, False)
+                    output = sess.run(pred)
+            except tf.errors.OutOfRangeError:
+                pass
+            
+        return output
     
 
 

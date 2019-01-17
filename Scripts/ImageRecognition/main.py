@@ -9,6 +9,7 @@ import tensorflow as tf
 import os
 import json
 import paths
+import numpy as np
 
 
 tf.reset_default_graph() 
@@ -45,7 +46,7 @@ img_path_val = img_path_train
 
     
 # Set up the neural network
-training_iters = 25
+training_iters = 10
 learning_rate = 0.001 
 #0.001 or 0.0001 are best but overfitting is an issue
 batch_size = 1 #seems to have a big influence, not sure whats wrong if i increase
@@ -58,12 +59,19 @@ dataset_val,labels_val = data.create_dataset(data_val,batch_size,img_path_val,n_
 network = network.CNN(training_iters, learning_rate, batch_size, n_input, \
               n_classes, img_path_train, img_path_val)
 
-#Train the network using the training data
+# Train the network using the training data
 train_loss, train_accuracy, val_loss, val_accuracy =\
 network.train(dataset_train,len(labels_train), dataset_val, len(labels_val))
 
+# Evaluate the performance of the network
 network.plot_loss(train_loss, val_loss)
 network.plot_accuracy(train_accuracy, val_accuracy)
+
+# Make a prediction on a test image
+result = network.predict("D:\\cocoapi\\images\\test2017\\000000006610.jpg")
+label = np.argmax(result)
+key = klasses[label][0]
+print(key)
 
 
 
