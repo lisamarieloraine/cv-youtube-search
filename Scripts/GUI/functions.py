@@ -1,6 +1,8 @@
 from tkinter import *
 from Scripts.WebScraping.ModuleYT import search_and_store
 from Scripts.WebScraping.FilterTerms import SortBy, Features, UploadDate, Duration
+from tkinter import filedialog
+# from VideoCapture import Device
 
 # Global filter Variables
 SORTBY = SortBy.Default.value  # String
@@ -35,8 +37,14 @@ DURATION_DICT = {
     'Short': Duration.Short.value
 }
 
+
 def pic_from_gallery():
-    file1=filedialog.askopenfile()
+    file1 = filedialog.askopenfile()
+
+# def take_pic():
+#     cam = Device()
+#     cam.saveSnapshot('image.jpg')
+
 
 
 # # def window_transition(deletions):
@@ -48,17 +56,22 @@ def pic_from_gallery():
 # #         except:
 # #             pass
 #
-def clear_window():
-    empty_window = Frame(root,
-                         height=800,
-                         width=600,
-                         bg=main_bg_colour)
-    empty_window.place(x=0,
-                       y=0)
+# def clear_window():
+#     empty_window = Frame(root,
+#                          height=800,
+#                          width=600,
+#                          bg=main_bg_colour)
+#     empty_window.place(x=0,
+#                        y=0)
+def upload_picture():
+    file1 = str(filedialog.askopenfilename(initialdir="/", title="Select file",
+                                           filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*"))))
+    print(file1)
 
-def show_main_window():
-    clear_window()
-    self.main_window()
+
+# def show_main_window():
+#     clear_window()
+#     self.main_window()
 #
 # # def show_main_window():
 # #     clear_window()
@@ -96,7 +109,7 @@ def show_main_window():
 # menu.add_command(label = 'Exit',command =  close_window)
 #
 
-    # def show_result_window():
+# def show_result_window():
 # #     #         clear_window()
 # #     #         result_window()
 # #     #
@@ -114,6 +127,7 @@ def print_URL(string, show_entry_func):
     print(list)
     show_entry_func(list)
 
+
 # Description: Sets the global variable SORTBY everytime the combobox is updated
 def sort_combo_func(event=None):
     global SORTBY
@@ -129,6 +143,7 @@ def feature_func(feature_string):
         FEATURES.append(feature_string)
     print(f'Feature string: {feature_string}')
 
+
 # Description: Sets the global variable UPLOADDATE everytime the combobox is updated
 def upload_combo_func(event=None):
     global UPLOADDATE
@@ -141,4 +156,3 @@ def duration_combo_func(event=None):
     global DURATION
     DURATION = DURATION_DICT[event.widget.get()]
     print(f'event.widget: {event.widget.get()}')
-

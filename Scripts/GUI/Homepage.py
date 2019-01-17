@@ -1,8 +1,14 @@
 from tkinter import *
 import Scripts.GUI.functions as funcs
 from Scripts.GUI.page_search import PageSearch
+
 from Scripts.GUI.page_webcam_search import PageWebcamSearch
-from tkinter import filedialog
+# from tkinter import filedialog
+#
+# from Scripts.GUI.functions import take_pic
+
+from Scripts.GUI.functions import upload_picture
+
 
 main_bg_colour = '#e1c793'
 main_button_colour = '#ead7b2'
@@ -25,12 +31,14 @@ class Homepage(Frame):
 
 
 
+        # camera_picture = PhotoImage(file='camera.png')
+        # self.take_picture_button.config(image=camera_picture)
 
         self.upload_picture_button = Button(self,
                                             text='Upload picture',
                                             bg=main_button_colour,
                                             font=main_font,
-                                            command= lambda: filedialog.askopenfile()
+                                            command=upload_picture
                                             )
 
         self.self_search_button = Button(self,
@@ -38,8 +46,9 @@ class Homepage(Frame):
                                          font=main_font,
                                          bg=main_button_colour,
                                          command=lambda: controller.show_frame(PageSearch))
+        self.webcame_test_button = Button(self,
+                                          text= 'test')
 
-        # command = funcs.pic_from_gallery
 
         # Button placements
         self.take_picture_button.place(x=200,
@@ -59,9 +68,10 @@ class Homepage(Frame):
                                       anchor='center',
                                       width=120,
                                       height=120)
+        self.webcame_test_button.place(x=10,
+                                       y=10)
 # Import pictures
-# camera_picture = PhotoImage(file = 'C:\\Users\Daniek\camera.png')
-# take_picture_button.config(image = camera_picture)
+
 #
 # gallery_picture = PhotoImage(file = 'C:\\Users\Daniek\Afbeelding3.png')
 # upload_picture_button.config(image = gallery_picture)

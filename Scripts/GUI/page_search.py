@@ -9,7 +9,6 @@ from Scripts.WebScraping.VerifyRequest import get_verified_response
 from Scripts.WebScraping.PullThumbnail import get_thumbnail
 import Scripts.GUI.Homepage
 
-
 main_bg_colour = '#e1c793'
 main_button_colour = '#ead7b2'
 main_font = 'Comfortaa'
@@ -18,7 +17,7 @@ side_bar_colour = '#e5cfa3'
 
 class PageSearch(Frame):
     _image = []
-    _thumbnail_list =[]
+    _thumbnail_list = []
 
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -26,15 +25,11 @@ class PageSearch(Frame):
         self.controller = controller
         self.config(background=main_bg_colour)
 
-
         # Build elements
         self.side_bar = Frame(self, height=600,
                               width=200,
                               bg=side_bar_colour)
 
-        self.search_term_label = Label(self, text='Search term',
-                                       font=(main_font, 15),
-                                       bg=side_bar_colour)
 
         self.sort_by_label = Label(self, text='Sort by',
                                    font=(main_font, 10),
@@ -43,6 +38,7 @@ class PageSearch(Frame):
         self.sort_combobox = ttk.Combobox(self, values=('Default', 'Relevance', 'Upload Time', 'View Count', 'Rating'),
                                           width=20,
                                           font=(main_font, 10))
+        self.sort_combobox.current(0)
 
         self.sort_combobox.bind('<<ComboboxSelected>>', funcs.sort_combo_func)
 
@@ -51,9 +47,11 @@ class PageSearch(Frame):
                                        bg=side_bar_colour)
 
         self.upload_date_combobox = ttk.Combobox(self, values=(
-        'Default', 'Past hour', 'Today', 'This week ', 'This month', 'This year'),
+            'Default', 'Past hour', 'Today', 'This week ', 'This month', 'This year'),
                                                  width=20,
                                                  font=(main_font, 10))
+
+        self.upload_date_combobox.current(0)
 
         self.upload_date_combobox.bind('<<ComboboxSelected>>', funcs.upload_combo_func)
 
@@ -66,6 +64,7 @@ class PageSearch(Frame):
                                               values=('Default', 'Long', 'Short'),
                                               width=20,
                                               font=(main_font, 10))
+        self.duration_combobox.current(0)
         self.duration_combobox.bind('<<ComboboxSelected>>', funcs.duration_combo_func)
 
         self.filter_label = Label(self,
@@ -90,7 +89,6 @@ class PageSearch(Frame):
                                                     width=20,
                                                     bg=side_bar_colour,
                                                     command=lambda: funcs.feature_func(Features.FourKResolution.value))
-
 
         self.HighDefinition_checkbox = Checkbutton(self,
                                                    text='High Definition',
@@ -119,16 +117,10 @@ class PageSearch(Frame):
                                     bg=main_button_colour,
                                     command=lambda: funcs.print_URL(self.input_searchterm.get(), self.show_thumbnails))
 
-
         # self.search_picture = PhotoImage(file = 'C:\\Users\Daniek\Afbeeding1.png')
         # self.search_button.config(image = search_picture)
 
-
-
         # Place elements
-
-        self.search_term_label.place(x=10,
-                                     y=10)
 
         self.sort_by_label.place(x=10,
                                  y=60)
@@ -178,9 +170,9 @@ class PageSearch(Frame):
         self.search_button.place(x=430,
                                  y=80)
 
-
     def show_thumbnails(self, _link_list):
         print('Converting url to image')
+
         # Thumbnail image
         def open_url(url):
             return lambda x: webbrowser.open_new(url)
@@ -197,21 +189,19 @@ class PageSearch(Frame):
             thumbnail_url = get_thumbnail(url)
             print(thumbnail_url)
             response = get_verified_response(thumbnail_url)
+            print(response.status)
+
             im = Image.open(io.BytesIO(response.data))
             im = im.resize((w, h), Image.ANTIALIAS)
             image = ImageTk.PhotoImage(im)
 
-
             thumbnail_button = Button(self, image=image,
-                                     width=w,
-                                     height=h)
-            thumbnail_button.place(x=260 +(0 if i<5 else (1.1*w if i<10 else 2.2*w)),
-                         y=150+(i % 5)*(h*1.1))
+                                      width=w,
+                                      height=h)
+            thumbnail_button.place(x=260 + (0 if i < 5 else (1.1 * w if i < 10 else 2.2 * w)),
+                                   y=150 + (i % 5) * (h * 1.1))
             # self._lambda_list.append(lambda x: webbrowser.open_new(_link_list[i]))
             thumbnail_button.bind("<Button-1>", open_url(url))
 
             self._image.append(image)
             self._thumbnail_list.append(thumbnail_button)
-
-
-
