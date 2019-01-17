@@ -30,10 +30,10 @@ class CNN:
         
         #set up dictionaries for the structure of the weight and bias terms
         self.weights = {
-        'wc1_1': tf.get_variable('w1_1', shape=(3,3,3,64), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc1_2' :tf.get_variable('w1_2', shape=(3,3,64,96), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc1_1': tf.get_variable('w1_1', shape=(3,3,3,32), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc1_2' :tf.get_variable('w1_2', shape=(3,3,32,32), initializer=tf.contrib.layers.xavier_initializer()), 
         #'wc1_3' :tf.get_variable('w1_3', shape=(3,3,32,32), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc2_1': tf.get_variable('w2_1', shape=(3,3,96,96), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc2_1': tf.get_variable('w2_1', shape=(3,3,32,96), initializer=tf.contrib.layers.xavier_initializer()), 
         #'wc2_2': tf.get_variable('w2_2', shape=(3,3,96,128), initializer=tf.contrib.layers.xavier_initializer()), 
         'wc3_1': tf.get_variable('w3_1', shape=(3,3,96,128), initializer=tf.contrib.layers.xavier_initializer()), 
         #'wc3_2': tf.get_variable('w3_2', shape=(3,3,128,128), initializer=tf.contrib.layers.xavier_initializer()), 
@@ -41,8 +41,8 @@ class CNN:
         'out': tf.get_variable('w6', shape=(128,n_classes), initializer=tf.contrib.layers.xavier_initializer()), 
         }
         self.biases = {
-            'bc1_1': tf.get_variable('b1_1', shape=(64), initializer=tf.contrib.layers.xavier_initializer()),
-            'bc1_2': tf.get_variable('b1_2', shape=(96), initializer=tf.contrib.layers.xavier_initializer()),
+            'bc1_1': tf.get_variable('b1_1', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
+            'bc1_2': tf.get_variable('b1_2', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
             #'bc1_3': tf.get_variable('b1_3', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
             'bc2_1': tf.get_variable('b2_1', shape=(96), initializer=tf.contrib.layers.xavier_initializer()),
             #'bc2_2': tf.get_variable('b2_2', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
