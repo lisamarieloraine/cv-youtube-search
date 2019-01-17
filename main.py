@@ -45,7 +45,7 @@ img_path_val = img_path_train
 
     
 # Set up the neural network
-training_iters = 15
+training_iters = 25
 learning_rate = 0.001 
 #0.001 or 0.0001 are best but overfitting is an issue
 batch_size = 1 #seems to have a big influence, not sure whats wrong if i increase

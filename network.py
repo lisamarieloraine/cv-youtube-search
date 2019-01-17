@@ -30,22 +30,59 @@ class CNN:
         
         #set up dictionaries for the structure of the weight and bias terms
         self.weights = {
-        'wc1': tf.get_variable('w0', shape=(3,3,3,32), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc1_1' :tf.get_variable('w1_1', shape=(3,3,32,32), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc2': tf.get_variable('w1', shape=(3,3,32,96), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc3': tf.get_variable('w2', shape=(3,3,96,128), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc1_1': tf.get_variable('w1_1', shape=(3,3,3,64), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc1_2' :tf.get_variable('w1_2', shape=(3,3,64,96), initializer=tf.contrib.layers.xavier_initializer()), 
+        #'wc1_3' :tf.get_variable('w1_3', shape=(3,3,32,32), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc2_1': tf.get_variable('w2_1', shape=(3,3,96,96), initializer=tf.contrib.layers.xavier_initializer()), 
+        #'wc2_2': tf.get_variable('w2_2', shape=(3,3,96,128), initializer=tf.contrib.layers.xavier_initializer()), 
+        'wc3_1': tf.get_variable('w3_1', shape=(3,3,96,128), initializer=tf.contrib.layers.xavier_initializer()), 
+        #'wc3_2': tf.get_variable('w3_2', shape=(3,3,128,128), initializer=tf.contrib.layers.xavier_initializer()), 
         'wd1': tf.get_variable('w3', shape=(4*4*128,128), initializer=tf.contrib.layers.xavier_initializer()), 
         'out': tf.get_variable('w6', shape=(128,n_classes), initializer=tf.contrib.layers.xavier_initializer()), 
         }
         self.biases = {
-            'bc1': tf.get_variable('b0', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
-            'bc2': tf.get_variable('b1', shape=(96), initializer=tf.contrib.layers.xavier_initializer()),
-            'bc3': tf.get_variable('b2', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
+            'bc1_1': tf.get_variable('b1_1', shape=(64), initializer=tf.contrib.layers.xavier_initializer()),
+            'bc1_2': tf.get_variable('b1_2', shape=(96), initializer=tf.contrib.layers.xavier_initializer()),
+            #'bc1_3': tf.get_variable('b1_3', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
+            'bc2_1': tf.get_variable('b2_1', shape=(96), initializer=tf.contrib.layers.xavier_initializer()),
+            #'bc2_2': tf.get_variable('b2_2', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
+            'bc3_1': tf.get_variable('b3_1', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
+            #'bc3_2': tf.get_variable('b3_2', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
             'bd1': tf.get_variable('b3', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
             'out': tf.get_variable('b4', shape=(n_classes), initializer=tf.contrib.layers.xavier_initializer()),
         }
-     
+    
+    
+    def conv_net(self, x,train = False):  
+
+        # here we call the conv2d function we had defined above and pass the input image x, weights wc1 and bias bc1
+        conv1 = self.conv2d(x, self.weights['wc1_1'], self.biases['bc1_1'])
+        # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 14*14 matrix.
+        conv1 = self.conv2d(conv1,self.weights['wc1_2'], self.biases['bc1_2'])
+       # conv1 = self.conv2d(conv1,self.weights['wc1_3'], self.biases['bc1_3'])
         
+        conv2 = self.conv2d(conv1, self.weights['wc2_1'], self.biases['bc2_1'])
+       # conv2 = self.conv2d(conv2, self.weights['wc2_2'], self.biases['bc2_2'])
+        # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 7*7 matrix.
+        conv2 = self.maxpool2d(conv2, k=2)
+
+        conv3 = self.conv2d(conv2,self.weights['wc3_1'], self.biases['bc3_1'])
+        #conv3 = self.conv2d(conv3,self.weights['wc3_2'], self.biases['bc3_2'])
+        # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 4*4.
+        conv3 = self.maxpool2d(conv3, k=2)
+
+        # Fully connected layer
+        # Reshape conv2 output to fit fully connected layer input
+        fc1 = tf.reshape(conv3, [-1, self.weights['wd1'].get_shape().as_list()[0]])
+        fc1 = tf.add(tf.matmul(fc1, self.weights['wd1']), self.biases['bd1'])
+        fc1 = tf.nn.relu(fc1)
+        
+        fc1 = tf.layers.dropout(fc1,rate = 0.5,training = train)
+        # Output, class prediction
+        # finally we multiply the fully connected layer with the weights and add a bias term. 
+        out = tf.add(tf.matmul(fc1, self.weights['out']), self.biases['out'])
+        return out
+    
     @staticmethod
     def plot_loss(train_loss, test_loss):
         plt.plot(range(len(train_loss)), train_loss, 'b', label='Training loss')
@@ -83,44 +120,7 @@ class CNN:
     @staticmethod  
     def maxpool2d(x, k=2):
         return tf.nn.max_pool(x, ksize=[1, k, k, 1], strides=[1, k, k, 1],padding='SAME')
-    
-    
-    def conv_net(self, x,train = False):  
-        #set train to false to remove dropouts
-        #problem: dropouts also active when validating 
-        # here we call the conv2d function we had defined above and pass the input image x, weights wc1 and bias bc1
-        x = tf.layers.dropout(x) #add to reduce overfitting
-        conv1 = self.conv2d(x, self.weights['wc1'], self.biases['bc1'])
-        # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 14*14 matrix.
-        conv1 = self.conv2d(conv1,self.weights['wc1_1'], self.biases['bc1'])
-        conv1 = self.conv2d(conv1,self.weights['wc1_1'], self.biases['bc1'])
-        conv1 = self.maxpool2d(conv1, k=2)
-     
-        conv1 = tf.layers.dropout(conv1,rate = 0.2,training = train)
-        # Convolution Layer
-        # here we call the conv2d function we had defined above and pass the input image x, weights wc2 and bias bc2.
-        conv2 = self.conv2d(conv1, self.weights['wc2'], self.biases['bc2'])
-        # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 7*7 matrix.
-        conv2 = self.maxpool2d(conv2, k=2)
 
-        conv2 = tf.layers.dropout(conv2,rate = 0.2,training = train)
-        conv3 = self.conv2d(conv2,self.weights['wc3'], self.biases['bc3'])
-        # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 4*4.
-        conv3 = self.maxpool2d(conv3, k=2)
-
-        conv3 = tf.layers.dropout(conv3,rate = 0.2,training = train)
-        # Fully connected layer
-        # Reshape conv2 output to fit fully connected layer input
-        fc1 = tf.reshape(conv3, [-1, self.weights['wd1'].get_shape().as_list()[0]])
-        fc1 = tf.add(tf.matmul(fc1, self.weights['wd1']), self.biases['bd1'])
-        fc1 = tf.nn.relu(fc1)
-        
-        fc1 = tf.layers.dropout(fc1,rate = 0.5,training = train)
-        # Output, class prediction
-        # finally we multiply the fully connected layer with the weights and add a bias term. 
-        out = tf.add(tf.matmul(fc1, self.weights['out']), self.biases['out'])
-        return out
-    
     
     def operations(self, x, y):
         pred = self.conv_net(x,False)
@@ -193,16 +193,11 @@ class CNN:
                 except tf.errors.OutOfRangeError:
                     pass
                     
-        
-# =============================================================================
-#                 print('\nEpoch: {}'.format(i + 1))
-#                 print('Train accuracy: {:.4f}, loss: {:.4f}'.format(train_accuracy / size_train,
-#                                                                      train_loss / size_train))
-#                 print('Val accuracy: {:.4f}, loss: {:.4f}\n'.format(val_accuracy / size_val, 
-#                                                                     val_loss / size_val))
-# =============================================================================
-
-
+                
+                print('\nEpoch: {}'.format(i + 1),\
+                      'Train accuracy: {:.4f}, loss: {:.4f}'.format(train_accuracy / size_train,train_loss / size_train),\
+                      'Val accuracy: {:.4f}, loss: {:.4f}\n'.format(val_accuracy / size_val, val_loss / size_val))
+          
                 # Append data of current epoch
                 train_losses.append(train_loss / size_train)
                 val_losses.append(val_loss / size_val)

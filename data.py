@@ -87,8 +87,7 @@ def create_dataset(data, batch_size,img_dir,res):#files is list of filenames, la
             jpg_list.append(element[0])
             labels_list.append(element[1])
         return jpg_list,labels_list
-    
-    print("building dataset")
+
     file_names,labels = split_filenames(data)
 
    #ValueError: Shape must be rank 0 but is rank 1 for 'ReadFile' (op: 'ReadFile') with input shapes: [?].
@@ -107,7 +106,6 @@ def create_dataset(data, batch_size,img_dir,res):#files is list of filenames, la
     os.chdir( img_dir )
     dataset = tf.data.Dataset.from_tensor_slices((filenames, classes))
     dataset = dataset.map(_parse_function).batch(batch_size)
-    print("dataset build")
     return dataset,labels  
             
             
