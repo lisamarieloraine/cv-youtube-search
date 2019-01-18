@@ -19,28 +19,31 @@ def run(write = False, predict = False, image = ""):
     
     # Setting up directories
     # this is done in a separate module to avoid changing directories with every pull
-    ann_path, img_path_train, img_path_val = "", "", " "
-    
-    #if we want to make a new selection of images
-    if write:
-        #banana and brocolli have a small intersection -> smaller problem
-        data_object = data.Data(ann_path,klasses,img_path_train, img_path_val)
-        data_object.write_data()
-        
-    #read in the selected images from file
-    os.chdir(ann_path)
-    with open('data_train.txt', 'r') as filehandle:  
-        data_train = json.load(filehandle)   
-    with open('data_val.txt', 'r') as filehandle:  
-        data_val = json.load(filehandle)
-    
-    #validation set contains only few examples that are prominent enough
-    #thats why we split the train set into a new train set and a validation set
-    data_shuffle = data_train   
-    random.shuffle(data_shuffle)
-    data_val = data_shuffle[0:150]
-    data_train = data_shuffle[150:]
-    img_path_val = img_path_train  
+    if predict == False:
+        ann_path, img_path_train, img_path_val = paths.init_paths()
+        #if we want to make a new selection of images
+        if write:
+            #banana and brocolli have a small intersection -> smaller problem
+            data_object = data.Data(ann_path,klasses,img_path_train, img_path_val)
+            data_object.write_data()
+            
+        #read in the selected images from file
+        os.chdir(ann_path)
+        with open('data_train.txt', 'r') as filehandle:  
+            data_train = json.load(filehandle)   
+        with open('data_val.txt', 'r') as filehandle:  
+            data_val = json.load(filehandle)
+            
+        #validation set contains only few examples that are prominent enough
+        #thats why we split the train set into a new train set and a validation set
+        data_shuffle = data_train   
+        random.shuffle(data_shuffle)
+        data_val = data_shuffle[0:150]
+        data_train = data_shuffle[150:]
+        img_path_val = img_path_train 
+    else:
+        ann_path, img_path_train, img_path_val = "", "", ""
+     
     
     # Setting up the neural network
     training_iters = 10
@@ -78,6 +81,6 @@ def run(write = False, predict = False, image = ""):
 #"D:\\cocoapi\\images\\test2017\\000000007127.jpg" other
 #"D:\\cocoapi\\images\\test2017\\000000014394.jpg" broccoli
 search_term = run(write = False, predict = True, \
-                  image = "C:\\Users\\plagl\\Downloads\\Broccoli.jpg")
+                  image = "D:\\cocoapi\\images\\test2017\\000000006054.jpg")
 print(search_term)
 
