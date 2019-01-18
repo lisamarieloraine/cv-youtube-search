@@ -19,7 +19,7 @@ def run(write = False, predict = False, image = ""):
     
     # Setting up directories
     # this is done in a separate module to avoid changing directories with every pull
-    ann_path, img_path_train, img_path_val = paths.init_paths()
+    ann_path, img_path_train, img_path_val = "", "", " "
     
     #if we want to make a new selection of images
     if write:

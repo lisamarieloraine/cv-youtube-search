@@ -1,34 +1,52 @@
-import io
-import base64
-try:
-    # Python2
-    import Tkinter as tk
-    from urllib2 import urlopen
-except ImportError:
-    # Python3
-    import tkinter as tk
-    from urllib.request import urlopen
-root = tk.Tk()
-root.title("display a website image")
-# a little more than width and height of image
-w = 520
-h = 320
-x = 80
-y = 100
-# use width x height + x_offset + y_offset (no spaces!)
-root.geometry("%dx%d+%d+%d" % (w, h, x, y))
+import PIL
+from PIL import Image, ImageTk
+import cv2
+from tkinter import *
 
-# this GIF picture previously downloaded to tinypic.com
-image_url = "http://i46.tinypic.com/r9oh0j.gif"
-image_byt = urlopen(image_url).read()
-image_b64 = base64.encodestring(image_byt)
-photo = tk.PhotoImage(data=image_b64)
-# create a white canvas
+root=Tk()
+def open_web():
+
+    width, height = 800, 600
+    cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
+    webcam_win = Toplevel(root)
+    Toplevel.bind('<Escape>', lambda e: webcam_win.quit())
+    lmain = Label(webcam_win)
+    lmain.pack()
+
+    takePicture = 0  # My variable
 
 
-cv = tk.Canvas(bg='white')
-cv.pack(side='top', fill='both', expand='yes')
-# put the image on the canvas with
-# create_image(xpos, ypos, image, anchor)
-cv.create_image(10, 10, image=photo, anchor='nw')
+    def TakePictureC():  # There is the change of the variable
+        global takePicture
+        takePicture = takePicture + 1  # Add "1" to the variable
+
+
+    def show_frame():
+        _, frame = cap.read()
+        frame = cv2.flip(frame, 1)
+        cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
+        img = PIL.Image.fromarray(cv2image)
+        imgtk = ImageTk.PhotoImage(image=img)
+        lmain.imgtk = imgtk
+        lmain.configure(image=imgtk)
+        lmain.after(10, show_frame)
+        global takePicture
+        if takePicture == 1:  # My option for take the image
+            img.save("test.png")  # Save the instant image
+            takePicture = takePicture - 1  # Remove "1" to the variable
+
+    screenTake = Button(webcam_win, text='ScreenShot', command=TakePictureC)  # The button for take picture
+    screenTake.pack()  # Pack option to see it
+
+    show_frame()
+
+
+bu1=Button(root, text = 'click', command = open_web)
+bu1.pack()
+
 root.mainloop()
+
+

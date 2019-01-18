@@ -95,11 +95,15 @@ class PageSearch(Frame):
                                                    width=20,
                                                    bg=side_bar_colour,
                                                    command=lambda: funcs.feature_func(Features.HighDefinition.value))
+
+        photo_go_back = PhotoImage(file='go_back.png')
         self.go_back_button = Button(self,
-                                     width=5,
-                                     height=2,
+                                     width=35,
+                                     height=35,
                                      bg=main_button_colour,
+                                     image=photo_go_back,
                                      command=lambda: controller.show_frame(Scripts.GUI.Homepage.Homepage))
+        self.go_back_button.image = photo_go_back
 
         self.result_label = Label(self,
                                   text='Results',
@@ -107,18 +111,17 @@ class PageSearch(Frame):
                                   bg=main_bg_colour)
 
         self.input_searchterm = Entry(self,
-                                      width=18,
-                                      font=(main_font, 11),
+                                      width=20,
+                                      font=(main_font, 12),
                                       textvariable=StringVar)
-
+        photo_search_small = PhotoImage(file='search_small.png')
         self.search_button = Button(self,
-                                    height=1,
-                                    width=3,
+                                    height=25,
+                                    width=25,
                                     bg=main_button_colour,
+                                    image=photo_search_small,
                                     command=lambda: funcs.print_URL(self.input_searchterm.get(), self.show_thumbnails))
-
-        # self.search_picture = PhotoImage(file = 'C:\\Users\Daniek\Afbeeding1.png')
-        # self.search_button.config(image = search_picture)
+        self.search_button.image = photo_search_small
 
         # Place elements
 
@@ -161,13 +164,13 @@ class PageSearch(Frame):
         self.go_back_button.place(x=710,
                                   y=20)
 
-        self.result_label.place(x=250,
+        self.result_label.place(x=260,
                                 y=10)
 
-        self.input_searchterm.place(x=250,
+        self.input_searchterm.place(x=260,
                                     y=80)
 
-        self.search_button.place(x=430,
+        self.search_button.place(x=450,
                                  y=80)
 
     def show_thumbnails(self, _link_list):

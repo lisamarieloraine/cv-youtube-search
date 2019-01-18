@@ -38,55 +38,41 @@ DURATION_DICT = {
 }
 
 
-def pic_from_gallery():
-    file1 = filedialog.askopenfile()
-
-# def take_pic():
-#     cam = Device()
-#     cam.saveSnapshot('image.jpg')
-
-
-
-# # def window_transition(deletions):
-# #     print (deletions)
-# #     for label in deletions:
-# #         print(label)
-# #         try:
-# #             label.place_forget()
-# #         except:
-# #             pass
+# def TakePictureC():  # There is the change of the variable
+#     global takePicture
+#     takePicture = takePicture + 1  # Add "1" to the variable
 #
-# def clear_window():
-#     empty_window = Frame(root,
-#                          height=800,
-#                          width=600,
-#                          bg=main_bg_colour)
-#     empty_window.place(x=0,
-#                        y=0)
+#
+# def show_frame():
+#     _, frame = cap.read()
+#     frame = cv2.flip(frame, 1)
+#     cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
+#     img = PIL.Image.fromarray(cv2image)
+#     imgtk = ImageTk.PhotoImage(image=img)
+#     lmain.imgtk = imgtk
+#     lmain.configure(image=imgtk)
+#     lmain.after(10, show_frame)
+#     global takePicture
+#     if takePicture == 1:  # My option for take the image
+#         img.save("test.png")  # Save the instant image
+#         takePicture = takePicture - 1  # Remove "1" to the variable
+
+
 def upload_picture():
     file1 = str(filedialog.askopenfilename(initialdir="/", title="Select file",
                                            filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*"))))
     print(file1)
 
 
-# def show_main_window():
-#     clear_window()
-#     self.main_window()
-#
-# # def show_main_window():
-# #     clear_window()
-# #     main_window()
-#
+# Close window function
+def close_win():
+    root.destroy()
 
-# # Close window function
-# def close_win():
-#     root.destroy()
-#
-# def close_window():
-#     close_que = messagebox.askquestion('Exit', 'Are you sure you want to exit?')
-#     if close_que == 'yes':
-#         close_win()
-#
+def close_window():
+    close_que = messagebox.askquestion('Exit', 'Are you sure you want to exit?')
+    if close_que == 'yes':
+        close_win()
+
 
 
 # # Dropdown menu
