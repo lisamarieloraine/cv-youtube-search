@@ -258,7 +258,7 @@ class CNN:
                     output = sess.run(pred)
             except tf.errors.OutOfRangeError:
                 pass
-            
+        os.chdir( sys.path[0] )    
         return output
     
 
