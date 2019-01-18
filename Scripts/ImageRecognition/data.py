@@ -1,5 +1,5 @@
 import os
-import coco
+import Scripts.ImageRecognition.coco as coco
 import json
 import tensorflow as tf
 from PIL import Image  # uses pillow

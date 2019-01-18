@@ -3,7 +3,7 @@ from Scripts.GUI.page_search import PageSearch
 
 from Scripts.GUI.page_webcam_search import PageWebcamSearch
 from PIL import Image, ImageTk
-import cv2
+#import cv2
 from tkinter import *
 
 from Scripts.GUI.functions import upload_picture
@@ -23,32 +23,32 @@ class Homepage(Frame):
 
         # Create Buttons
 
-        photo_take = PhotoImage(file='camera.png')
+        #photo_take = PhotoImage(file='camera.png')
         self.take_picture_button = Button(self,
                                           text='Take picture',
                                           bg=main_button_colour,
-                                          image=photo_take,
+                                          #image=photo_take,
                                           font=main_font,
                                           command=lambda: controller.show_frame(PageWebcamSearch))
-        self.take_picture_button.image = photo_take
+        #self.take_picture_button.image = photo_take
 
-        photo_upload = PhotoImage(file='Afbeelding3.png')
+        #photo_upload = PhotoImage(file='Afbeelding3.png')
         self.upload_picture_button = Button(self,
                                             text='Upload picture',
                                             bg=main_button_colour,
                                             font=main_font,
-                                            image=photo_upload,
+                                            #image=photo_upload,
                                             command=upload_picture)
-        self.upload_picture_button.image = photo_upload
+        #self.upload_picture_button.image = photo_upload
 
-        photo_search = PhotoImage(file='search.png')
+        #photo_search = PhotoImage(file='search.png')
         self.self_search_button = Button(self,
                                          text='Search',
                                          font=main_font,
                                          bg=main_button_colour,
-                                         image=photo_search,
+                                         #image=photo_search,
                                          command=lambda: controller.show_frame(PageSearch))
-        self.self_search_button.image = photo_search
+        #self.self_search_button.image = photo_search
 
         self.webcame_test_button = Button(self,
                                           text='test')

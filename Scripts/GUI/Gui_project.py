@@ -1,7 +1,7 @@
 from tkinter import *
 import PIL
 from PIL import Image, ImageTk
-import cv2
+#import cv2
 
 from Scripts.GUI.Homepage import Homepage
 from Scripts.GUI.page_search import PageSearch

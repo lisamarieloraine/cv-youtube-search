@@ -9,6 +9,9 @@ from Scripts.WebScraping.FilterTerms import Features
 from Scripts.WebScraping.VerifyRequest import get_verified_response
 from Scripts.WebScraping.PullThumbnail import get_thumbnail
 import Scripts.GUI.Homepage
+import Scripts.ImageRecognition
+import Scripts.ImageRecognition.main as main
+import Scripts.ImageRecognition.data
 
 main_bg_colour = '#e1c793'
 main_button_colour = '#ead7b2'
@@ -30,7 +33,8 @@ class PageWebcamSearch(Frame):
         self.side_bar = Frame(self, height=600,
                               width=200,
                               bg=side_bar_colour)
-        self.input_searchterm = upload_picture  # TODO: this is the output of the CNN
+        picture = upload_picture()
+        self.input_searchterm = main.run(write = False, predict = True, image = picture)  # TODO: this is the output of the CNN
         self.search_term_label = Label(self, text=self.input_searchterm,
                                        font=(main_font, 15),
                                        bg=side_bar_colour)
@@ -96,14 +100,14 @@ class PageWebcamSearch(Frame):
                                                    bg=side_bar_colour,
                                                    command=lambda: funcs.feature_func(Features.HighDefinition.value))
 
-        photo_go_back = PhotoImage(file='go_back.png')
+        #photo_go_back = PhotoImage(file='go_back.png')
         self.go_back_button = Button(self,
                                      width=35,
                                      height=35,
                                      bg=main_button_colour,
-                                     image=photo_go_back,
+                                     #image=photo_go_back,
                                      command=lambda: controller.show_frame(Scripts.GUI.Homepage.Homepage))
-        self.go_back_button.image = photo_go_back
+        #self.go_back_button.image = photo_go_back
 
         self.result_label = Label(self,
                                   text='Results',

@@ -61,7 +61,7 @@ DURATION_DICT = {
 def upload_picture():
     file1 = str(filedialog.askopenfilename(initialdir="/", title="Select file",
                                            filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*"))))
-    print(file1)
+    return file1
 
 
 # Close window function

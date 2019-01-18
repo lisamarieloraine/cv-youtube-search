@@ -1,15 +1,16 @@
 # Import libraries
 import random
 import imp
-import data
+import Scripts.ImageRecognition.data as data
 imp.reload(data)
-import network as net
+import Scripts.ImageRecognition.network as net
 imp.reload(net)
 import tensorflow as tf
 import os
 import json
-import paths
+import Scripts.ImageRecognition.paths as paths
 import numpy as np
+import sys
 
 # Entry point to our neural network
 def run(write = False, predict = False, image = ""):
@@ -72,6 +73,7 @@ def run(write = False, predict = False, image = ""):
         result = network.predict(image)
         label = np.argmax(result)
         key = klasses[label][0]
+        os.chdir( sys.path[0] )
         return key
 
 
@@ -80,7 +82,7 @@ def run(write = False, predict = False, image = ""):
 #"D:\\cocoapi\\images\\test2017\\000000006054.jpg" banana
 #"D:\\cocoapi\\images\\test2017\\000000007127.jpg" other
 #"D:\\cocoapi\\images\\test2017\\000000014394.jpg" broccoli
-search_term = run(write = False, predict = True, \
-                  image = "D:\\cocoapi\\images\\test2017\\000000006054.jpg")
-print(search_term)
+#search_term = run(write = False, predict = True, \
+#                  image = "D:\\cocoapi\\images\\test2017\\000000006054.jpg")
+#print(search_term)
 

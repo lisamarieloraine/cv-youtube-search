@@ -96,14 +96,14 @@ class PageSearch(Frame):
                                                    bg=side_bar_colour,
                                                    command=lambda: funcs.feature_func(Features.HighDefinition.value))
 
-        photo_go_back = PhotoImage(file='go_back.png')
+        #photo_go_back = PhotoImage(file='go_back.png')
         self.go_back_button = Button(self,
                                      width=35,
                                      height=35,
                                      bg=main_button_colour,
-                                     image=photo_go_back,
+                                     #image=photo_go_back,
                                      command=lambda: controller.show_frame(Scripts.GUI.Homepage.Homepage))
-        self.go_back_button.image = photo_go_back
+        #self.go_back_button.image = photo_go_back
 
         self.result_label = Label(self,
                                   text='Results',
@@ -114,14 +114,14 @@ class PageSearch(Frame):
                                       width=20,
                                       font=(main_font, 12),
                                       textvariable=StringVar)
-        photo_search_small = PhotoImage(file='search_small.png')
+        #photo_search_small = PhotoImage(file='search_small.png')
         self.search_button = Button(self,
                                     height=25,
                                     width=25,
                                     bg=main_button_colour,
-                                    image=photo_search_small,
+                                    #image=photo_search_small,
                                     command=lambda: funcs.print_URL(self.input_searchterm.get(), self.show_thumbnails))
-        self.search_button.image = photo_search_small
+        #self.search_button.image = photo_search_small
 
         # Place elements
 
