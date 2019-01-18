@@ -18,9 +18,10 @@ tf.reset_default_graph()
 ann_path, img_path_train, img_path_val = paths.init_paths()
 
 #if we want to make a new selection of images
-write = False
+write = True
 if write:
-    klasses = [('banana', 0),('broccoli',1)] 
+    klasses = [('banana', 0),('broccoli',1),('car',2)] 
+    # there will be an extra class containing random pictures labeled as 2
     #banana and brocolli have a small intersection -> toy problem
     data_object = data.Data(ann_path,klasses,img_path_train, img_path_val)
     data_object.write_data()
@@ -33,37 +34,41 @@ with open('data_train.txt', 'r') as filehandle:
 with open('data_val.txt', 'r') as filehandle:  
     data_val = json.load(filehandle)
 
-
+data_validation = data_val
 #validation set contains few examples that are prominent enough
 #thats why i split the train set into a new train set and a validation set
 data_shuffle = data_train   
 random.shuffle(data_shuffle)
-data_val = data_shuffle[0:150]
-data_train = data_shuffle[150:]
+data_val = data_shuffle[0:100]
+data_train = data_shuffle[100:]
 img_path_val = img_path_train  
 
 
     
 # Set up the neural network
 training_iters = 25
-learning_rate = 0.001 
+learning_rate = 0.001
 #0.001 or 0.0001 are best but overfitting is an issue
 batch_size = 1 #seems to have a big influence, not sure whats wrong if i increase
 n_input = 64
-n_classes = 2
+n_classes = 3
+
 print("learning rate",learning_rate)
-dataset_train,labels_train = data.create_dataset(data_train,batch_size,img_path_train,n_input)
-dataset_val,labels_val = data.create_dataset(data_val,batch_size,img_path_val,n_input)
-
-network = network.CNN(training_iters, learning_rate, batch_size, n_input, \
-              n_classes, img_path_train, img_path_val)
-
-#Train the network using the training data
-train_loss, train_accuracy, val_loss, val_accuracy =\
-network.train(dataset_train,len(labels_train), dataset_val, len(labels_val))
-
-network.plot_loss(train_loss, val_loss)
-network.plot_accuracy(train_accuracy, val_accuracy)
-
-
-
+# =============================================================================
+# dataset_train,labels_train = data.create_dataset(data_train,batch_size,img_path_train,n_input)
+# dataset_val,labels_val = data.create_dataset(data_val,batch_size,img_path_val,n_input)
+# 
+# network = network.CNN(training_iters, learning_rate, batch_size, n_input, \
+#               n_classes, img_path_train, img_path_val)
+# 
+# #Train the network using the training data
+# train_loss, train_accuracy, val_loss, val_accuracy =\
+# network.train(dataset_train,len(labels_train), dataset_val, len(labels_val))
+# 
+# network.plot_loss(train_loss, val_loss)
+# network.plot_accuracy(train_accuracy, val_accuracy)
+# 
+# 
+# 
+# 
+# =============================================================================
