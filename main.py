@@ -18,7 +18,7 @@ tf.reset_default_graph()
 ann_path, img_path_train, img_path_val = paths.init_paths()
 
 #if we want to make a new selection of images
-write = True
+write = False
 if write:
     klasses = [('banana', 0),('broccoli',1),('car',2)] 
     # there will be an extra class containing random pictures labeled as 2
@@ -54,21 +54,19 @@ n_input = 64
 n_classes = 3
 
 print("learning rate",learning_rate)
-# =============================================================================
-# dataset_train,labels_train = data.create_dataset(data_train,batch_size,img_path_train,n_input)
-# dataset_val,labels_val = data.create_dataset(data_val,batch_size,img_path_val,n_input)
-# 
-# network = network.CNN(training_iters, learning_rate, batch_size, n_input, \
-#               n_classes, img_path_train, img_path_val)
-# 
-# #Train the network using the training data
-# train_loss, train_accuracy, val_loss, val_accuracy =\
-# network.train(dataset_train,len(labels_train), dataset_val, len(labels_val))
-# 
-# network.plot_loss(train_loss, val_loss)
-# network.plot_accuracy(train_accuracy, val_accuracy)
-# 
-# 
-# 
-# 
-# =============================================================================
+dataset_train,labels_train = data.create_dataset(data_train,batch_size,img_path_train,n_input)
+dataset_val,labels_val = data.create_dataset(data_val,batch_size,img_path_val,n_input)
+
+network = network.CNN(training_iters, learning_rate, batch_size, n_input, \
+              n_classes, img_path_train, img_path_val)
+
+#Train the network using the training data
+train_loss, train_accuracy, val_loss, val_accuracy =\
+network.train(dataset_train,len(labels_train), dataset_val, len(labels_val))
+
+network.plot_loss(train_loss, val_loss)
+network.plot_accuracy(train_accuracy, val_accuracy)
+
+
+
+
