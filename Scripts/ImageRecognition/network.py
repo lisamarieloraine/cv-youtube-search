@@ -18,10 +18,8 @@ class CNN:
         self.epochs = epochs
         self.learning_rate = alpha
         self.batch_size = batch_size
-        # input data shape (img shape: 28*28)
-        self.n_input = n_inputs
-        # total classes (0-3 digits)
-        self.n_classes = n_classes
+        self.n_input = n_inputs # input data shape (image shape: 64*64 pixels)
+        self.n_classes = n_classes # total number of classes
         self.img_dir_train = img_dir_train
         self.img_dir_val = img_dir_val
         
@@ -61,7 +59,6 @@ class CNN:
     
     
     def conv_net(self, x, train = False):  
-
         # call the conv2d function we had defined above and pass the input image x, weights wc1 and bias bc1
         conv1 = self.conv2d(x, self.weights['wc1_1'], self.biases['bc1_1'])
         # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 14*14 matrix.
@@ -84,9 +81,7 @@ class CNN:
         fc1 = tf.reshape(conv3, [-1, self.weights['wd1_1'].get_shape().as_list()[0]])
         fc1 = tf.add(tf.matmul(fc1, self.weights['wd1_1']), self.biases['bd1_1'])
         fc1 = tf.nn.relu(fc1)
-        
         fc1 = tf.layers.dropout(fc1,rate = 0.5,training = train)
-        
 # =============================================================================
 #         fc2 = tf.reshape(fc1, [-1, self.weights['wd1_2'].get_shape().as_list()[0]])
 #         fc2 = tf.add(tf.matmul(fc2, self.weights['wd1_2']), self.biases['bd1_2'])
@@ -177,15 +172,18 @@ class CNN:
             val_losses = []
             train_accuracies = []
             val_accuracies = []
-
-            for i in range(self.epochs):
+            
+            epoch = 0
+            val_acc = 0
+            
+            while val_acc < 0.8 and epoch < self.epochs:
+                # Initialize performance measures
                 train_loss, train_accuracy = 0, 0
                 val_loss, val_accuracy = 0, 0
                 
                 # Start train iterator
                 os.chdir( self.img_dir_train )
                 sess.run(train_iterator)
-
                 try:
                     while True:
                         opt, acc, loss = sess.run([optimizer, accuracy, cost])
@@ -204,15 +202,19 @@ class CNN:
                         val_accuracy += acc
                 except tf.errors.OutOfRangeError:
                     pass
-
+                
+                # Udpate epoch info
+                val_acc = (val_accuracy / size_val)
+                epoch += 1
                 # Append data of current epoch
-                print('\nEpoch: {}'.format(i + 1))
+                print('\nEpoch: {}'.format(epoch))
                 train_losses.append(train_loss / size_train)
                 val_losses.append(val_loss / size_val)
                 train_accuracies.append(train_accuracy / size_train)
                 val_accuracies.append(val_accuracy / size_val)
         
-            # Save the variables to disk.
+        
+            # Save the variables to disk after training completed
             saver = tf.train.Saver(max_to_keep=0)
             path = os.path.join(sys.path[0], 'Models\cnn-version')
             save_path = saver.save(sess, path, global_step=0)
@@ -223,7 +225,7 @@ class CNN:
     
     
     def predict(self, image_path):
-        # get directory of this script to load model
+        # get directory of this script to load pretrained model
         script_path = sys.path[0]
         
         # read given image

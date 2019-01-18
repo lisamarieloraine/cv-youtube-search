@@ -46,15 +46,17 @@ def run(write = False, predict = False, image = ""):
     training_iters = 10
     learning_rate = 0.001  # 0.001 or 0.0001 are best
     batch_size = 1 # seems to have some influence on performance
-    n_input = 64 # image resolution, i.e. 64x64 pixels
+    n_pixels = 64 # image resolution, i.e. 64x64 pixels
     n_classes = len(klasses)
-    dataset_train,labels_train = data.create_dataset(data_train,batch_size,img_path_train,n_input)
-    dataset_val,labels_val = data.create_dataset(data_val,batch_size,img_path_val,n_input)
-    network = net.CNN(training_iters, learning_rate, batch_size, n_input, \
+    
+    network = net.CNN(training_iters, learning_rate, batch_size, n_pixels, \
                   n_classes, img_path_train, img_path_val)
     
     # Either train the network or use a pretrained network for predicting
     if predict == False:
+        # Create datasets for training and validation
+        dataset_train,labels_train = data.create_dataset(data_train,batch_size,img_path_train,n_pixels)
+        dataset_val,labels_val = data.create_dataset(data_val,batch_size,img_path_val,n_pixels)
         # Train the network using the training data
         train_loss, train_accuracy, val_loss, val_accuracy =\
         network.train(dataset_train,len(labels_train), dataset_val, len(labels_val))
@@ -76,6 +78,6 @@ def run(write = False, predict = False, image = ""):
 #"D:\\cocoapi\\images\\test2017\\000000007127.jpg" other
 #"D:\\cocoapi\\images\\test2017\\000000014394.jpg" broccoli
 search_term = run(write = False, predict = True, \
-                  image = "D:\\cocoapi\\images\\test2017\\000000006054.jpg")
+                  image = "C:\\Users\\plagl\\Downloads\\Broccoli.jpg")
 print(search_term)
 
