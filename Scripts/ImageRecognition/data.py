@@ -97,11 +97,7 @@ def create_dataset(data, batch_size,img_dir,res):#files is list of filenames, la
 
     # `labels[i] is the label for the image in filenames[i].
     classes = tf.constant(labels)
-    
-    #might improve efficiency for large datasets
-    #placeholder_X = tf.placeholder(filenames_train.dtype, filenames_train.shape)
-    #placeholder_y = tf.placeholder(labels_train.dtype, labels_train.shape)
-    
+
     # Create separate Datasets for training and validation
     os.chdir( img_dir )
     dataset = tf.data.Dataset.from_tensor_slices((filenames, classes))

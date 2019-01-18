@@ -62,11 +62,11 @@ class CNN:
     
     def conv_net(self, x, train = False):  
 
-        # here we call the conv2d function we had defined above and pass the input image x, weights wc1 and bias bc1
+        # call the conv2d function we had defined above and pass the input image x, weights wc1 and bias bc1
         conv1 = self.conv2d(x, self.weights['wc1_1'], self.biases['bc1_1'])
         # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 14*14 matrix.
         conv1 = self.conv2d(conv1,self.weights['wc1_2'], self.biases['bc1_2'])
-       # conv1 = self.conv2d(conv1,self.weights['wc1_3'], self.biases['bc1_3'])
+        # conv1 = self.conv2d(conv1,self.weights['wc1_3'], self.biases['bc1_3'])
         conv1 = self.maxpool2d(conv1,k=2)
         
         conv2 = self.conv2d(conv1, self.weights['wc2_1'], self.biases['bc2_1'])
@@ -79,7 +79,7 @@ class CNN:
         # Max Pooling (down-sampling), this chooses the max value from a 2*2 matrix window and outputs a 4*4.
         conv3 = self.maxpool2d(conv3, k=2)
 
-        # Fully connected layer
+        # Fully connected layer with relu activation function
         # Reshape conv2 output to fit fully connected layer input
         fc1 = tf.reshape(conv3, [-1, self.weights['wd1_1'].get_shape().as_list()[0]])
         fc1 = tf.add(tf.matmul(fc1, self.weights['wd1_1']), self.biases['bd1_1'])
@@ -94,16 +94,16 @@ class CNN:
 #         fc2 = tf.layers.dropout(fc2,rate = 0.5,training = train)
 # =============================================================================
         
-        # Output, class prediction
-        # finally we multiply the fully connected layer with the weights and add a bias term. 
+        # Output, class predictions
+        # we multiply the fully connected layer with the weights and add a bias 
         out = tf.add(tf.matmul(fc1, self.weights['out']), self.biases['out'])
         return out
     
     @staticmethod
     def plot_loss(train_loss, test_loss):
         plt.plot(range(len(train_loss)), train_loss, 'b', label='Training loss')
-        plt.plot(range(len(test_loss)), test_loss, 'r', label='Test loss')
-        plt.title('Training and Test loss')
+        plt.plot(range(len(test_loss)), test_loss, 'r', label='Validation loss')
+        plt.title('Training and Validation loss')
         plt.xlabel('Epochs ',fontsize=16)
         plt.ylabel('Loss',fontsize=16)
         plt.legend()
@@ -115,8 +115,8 @@ class CNN:
     @staticmethod
     def plot_accuracy(train_accuracy, test_accuracy):
         plt.plot(range(len(train_accuracy)), train_accuracy, 'b', label='Training Accuracy')
-        plt.plot(range(len(test_accuracy)), test_accuracy, 'r', label='Test Accuracy')
-        plt.title('Training and Test Accuracy')
+        plt.plot(range(len(test_accuracy)), test_accuracy, 'r', label='Validation Accuracy')
+        plt.title('Training and Validation Accuracy')
         plt.xlabel('Epochs ',fontsize=16)
         plt.ylabel('Accuracy',fontsize=16)
         plt.legend()
