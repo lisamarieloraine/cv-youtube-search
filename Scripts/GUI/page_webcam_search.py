@@ -1,6 +1,5 @@
 import io
 import webbrowser
-from Scripts.GUI.functions import upload_picture
 from tkinter import *
 import Scripts.GUI.functions as funcs
 from tkinter import ttk
@@ -35,7 +34,7 @@ class PageWebcamSearch(Frame):
         self.side_bar = Frame(self, height=600,
                               width=200,
                               bg=side_bar_colour)
-        picture = upload_picture()
+        # picture = funcs.upload_picture()
         self.input_searchterm = 'banana'  # main.run(write = False, predict = True, image = picture)
         self.search_term_label = Label(self, text=self.input_searchterm,
                                        font=(main_font, 15),
