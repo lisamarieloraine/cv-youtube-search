@@ -98,7 +98,7 @@ class PageSearch(Frame):
                                                    bg=side_bar_colour,
                                                    command=lambda: funcs.feature_func(Features.HighDefinition.value))
 
-        photo_go_back = PhotoImage(file=os.path.join(sys.path[0], 'Images\go_back.png'))
+        photo_go_back = PhotoImage(file=os.path.join(sys.path[1], 'Images\go_back.png'))
         self.go_back_button = Button(self,
                                      width=35,
                                      height=35,
@@ -116,7 +116,7 @@ class PageSearch(Frame):
                                       width=20,
                                       font=(main_font, 12),
                                       textvariable=StringVar)
-        photo_search_small = PhotoImage(file=os.path.join(sys.path[0], 'Images\search_small.png'))
+        photo_search_small = PhotoImage(file=os.path.join(sys.path[1], 'Images\search_small.png'))
         self.search_button = Button(self,
                                     height=25,
                                     width=25,

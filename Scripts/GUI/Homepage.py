@@ -34,7 +34,7 @@ class Homepage(Frame):
                                           command=lambda: controller.show_frame(PageWebcamSearch))
         self.take_picture_button.image = photo_take
 
-        photo_upload = PhotoImage(file=os.path.join(sys.path[0], 'Images\Afbeelding3.png'))
+        photo_upload = PhotoImage(file=os.path.join(sys.path[1], 'Images\Afbeelding3.png'))
         self.upload_picture_button = Button(self,
                                             text='Upload picture',
                                             bg=main_button_colour,
