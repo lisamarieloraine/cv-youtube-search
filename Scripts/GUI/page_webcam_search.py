@@ -36,7 +36,7 @@ class PageWebcamSearch(Frame):
                               width=200,
                               bg=side_bar_colour)
         picture = upload_picture()
-        self.input_searchterm = main.run(write = False, predict = True, image = picture)
+        self.input_searchterm = 'banana'  # main.run(write = False, predict = True, image = picture)
         self.search_term_label = Label(self, text=self.input_searchterm,
                                        font=(main_font, 15),
                                        bg=side_bar_colour)
@@ -48,7 +48,7 @@ class PageWebcamSearch(Frame):
         self.sort_combobox = ttk.Combobox(self, values=('Default', 'Relevance', 'Upload Time', 'View Count', 'Rating'),
                                           width=20,
                                           font=(main_font, 10))
-
+        self.sort_combobox.current(0)
         self.sort_combobox.bind('<<ComboboxSelected>>', funcs.sort_combo_func)
 
         self.upload_date_label = Label(self, text='Upload Date',
@@ -59,7 +59,7 @@ class PageWebcamSearch(Frame):
             'Default', 'Past hour', 'Today', 'This week ', 'This month', 'This year'),
                                                  width=20,
                                                  font=(main_font, 10))
-
+        self.upload_date_combobox.current(0)
         self.upload_date_combobox.bind('<<ComboboxSelected>>', funcs.upload_combo_func)
 
         self.duration_label = Label(self,
@@ -71,6 +71,7 @@ class PageWebcamSearch(Frame):
                                               values=('Default', 'Long', 'Short'),
                                               width=20,
                                               font=(main_font, 10))
+        self.duration_combobox.current(0)
         self.duration_combobox.bind('<<ComboboxSelected>>', funcs.duration_combo_func)
 
         self.filter_label = Label(self,
@@ -102,7 +103,7 @@ class PageWebcamSearch(Frame):
                                                    bg=side_bar_colour,
                                                    command=lambda: funcs.feature_func(Features.HighDefinition.value))
 
-        photo_go_back = PhotoImage(file=os.path.join(sys.path[0], 'Images\go_back.png'))
+        photo_go_back = PhotoImage(file=os.path.join(sys.path[1], 'Images\go_back.png'))
         self.go_back_button = Button(self,
                                      width=35,
                                      height=35,

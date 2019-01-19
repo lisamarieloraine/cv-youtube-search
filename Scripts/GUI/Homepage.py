@@ -43,7 +43,7 @@ class Homepage(Frame):
                                             command=upload_picture)
         self.upload_picture_button.image = photo_upload
 
-        photo_search = PhotoImage(file='search.png')
+        photo_search = PhotoImage(file=os.path.join(sys.path[1], 'Images\search.png'))
         self.self_search_button = Button(self,
                                          text='Search',
                                          font=main_font,

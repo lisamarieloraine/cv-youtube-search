@@ -32,7 +32,6 @@ class PageSearch(Frame):
                               width=200,
                               bg=side_bar_colour)
 
-
         self.sort_by_label = Label(self, text='Sort by',
                                    font=(main_font, 10),
                                    bg=side_bar_colour)
