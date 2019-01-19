@@ -55,10 +55,10 @@ def import_youtube_data(_youtube_url):
 # @return <class 'string'>
 def filter_search_string(_search_term, _filter=list()):
     # TODO: '+recipe' For a forced recipe video
-    result = f'{_search_term} +recipe'
+    result = '{} +recipe'.format(_search_term)
     for term in _filter:
         if term != '':
-            result += f', {term}'
+            result += ', {}'.format(term)
     return result
 
 
@@ -71,9 +71,9 @@ def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_fil
 
     filter_term = filter_search_string(_search_term, [_uploadtime_filter, _duration_filter] + _feature_filter)  # Format filter terms
     formatted_search_term = filter_term.replace("+", "%2B").replace(",", "%2C").replace(" ", "+")  # Format search term with pluses, commas, spaces
-    print(f'Using filter search term: {formatted_search_term}')
+    print('Using filter search term: {}'.format(formatted_search_term))
 
-    youtube_url = f'https://www.youtube.com/results?{_sortby_filter}search_query={formatted_search_term}'
+    youtube_url = 'https://www.youtube.com/results?{}search_query={}'.format(_sortby_filter, formatted_search_term)
     print(youtube_url)
     return import_youtube_data(youtube_url)
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     _list = search_and_store('banana', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Duration.Short.value, [Features.Subtitles.value])
     print('--- Search function ---')
     for link in _list:
-        print(f'Video: {link}')
-        print(f'Thumbnail: {get_thumbnail(link)}')
+        print('Video: {}'.format(link))
+        print('Thumbnail: {}'.format(get_thumbnail(link)))
         # webbrowser.open(get_thumbnail(link))
     print(len(_list))

@@ -118,7 +118,7 @@ def print_URL(string, show_entry_func):
 def sort_combo_func(event=None):
     global SORTBY
     SORTBY = SORTBY_DICT[event.widget.get()]
-    print(f'event.widget: {event.widget.get()}')
+    print('event.widget: {}'.format(event.widget.get()))
 
 
 def feature_func(feature_string):
@@ -127,18 +127,18 @@ def feature_func(feature_string):
         FEATURES.remove(feature_string)
     else:
         FEATURES.append(feature_string)
-    print(f'Feature string: {feature_string}')
+    print('Feature string: {}'.format(feature_string))
 
 
 # Description: Sets the global variable UPLOADDATE everytime the combobox is updated
 def upload_combo_func(event=None):
     global UPLOADDATE
     UPLOADDATE = UPLOADDATE_DICT[event.widget.get()]
-    print(f'event.widget: {event.widget.get()}')
+    print('event.widget: {}'.format(event.widget.get()))
 
 
 # Description: Sets the global variable DURATION everytime the combobox is updated
 def duration_combo_func(event=None):
     global DURATION
     DURATION = DURATION_DICT[event.widget.get()]
-    print(f'event.widget: {event.widget.get()}')
+    print('event.widget: {}'.format(event.widget.get()))

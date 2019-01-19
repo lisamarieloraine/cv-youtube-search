@@ -9,5 +9,5 @@ def get_thumbnail(_youtube_link):
         link_id = link_id[1]
     else:
         return None
-    url = f'https://img.youtube.com/vi/{link_id}/maxresdefault.jpg'
+    url = 'https://img.youtube.com/vi/{}/maxresdefault.jpg'.format(link_id)
     return url
