@@ -35,7 +35,7 @@ class PageWebcamSearch(Frame):
                               width=200,
                               bg=side_bar_colour)
         # picture = funcs.upload_picture()
-        self.input_searchterm = 'banana'  # main.run(write = False, predict = True, image = picture)
+        self.input_searchterm = 'Food'  # main.run(write = False, predict = True, image = picture)
         self.search_term_label = Label(self, text=self.input_searchterm,
                                        font=(main_font, 15),
                                        bg=side_bar_colour)

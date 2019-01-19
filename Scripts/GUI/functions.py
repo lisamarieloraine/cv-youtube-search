@@ -1,8 +1,13 @@
 from tkinter import *
 from Scripts.WebScraping.ModuleYT import search_and_store
 from Scripts.WebScraping.FilterTerms import SortBy, Features, UploadDate, Duration
+import Scripts.ImageRecognition.main as main
 from tkinter import filedialog
 # from VideoCapture import Device
+
+# Global Picture Variable
+SEARCHPICTURE = None
+SEARCHPICTURE_DICT = {}  # search term <string> ##(, url list <list>)
 
 # Global filter Variables
 SORTBY = SortBy.Default.value  # String
@@ -57,10 +62,34 @@ DURATION_DICT = {
 #         img.save("test.png")  # Save the instant image
 #         takePicture = takePicture - 1  # Remove "1" to the variable
 
+def prepair_webcam_search(frame_data, frame_controller):
+    """Opens up webcam search page while checking if globally selected picture is available
+    Otherwise, open file browser. Then throw picture through CNN and provide a search term"""
+    global SEARCHPICTURE, SEARCHPICTURE_DICT
+    if SEARCHPICTURE is None:
+        upload_picture()
+        # Possibility to upload picture and denied
+        if SEARCHPICTURE is None:
+            return None
+
+    if SEARCHPICTURE in SEARCHPICTURE_DICT:
+        frame_data.input_searchterm = SEARCHPICTURE_DICT[SEARCHPICTURE]
+    else:
+        new_search_term = main.run(write = False, predict = True, image = SEARCHPICTURE)
+        frame_controller.frames[frame_data].input_searchterm = new_search_term
+        SEARCHPICTURE_DICT[SEARCHPICTURE] = new_search_term
+
+    print(frame_controller.frames[frame_data].input_searchterm)
+    print_URL(frame_controller.frames[frame_data].input_searchterm, frame_controller.frames[frame_data].show_thumbnails)
+    return frame_controller.show_frame(frame_data)
+
 
 def upload_picture():
     file1 = str(filedialog.askopenfilename(initialdir="/", title="Select file",
                                            filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*"))))
+    global SEARCHPICTURE
+    SEARCHPICTURE = file1
+    print(file1)
     return file1
 
 

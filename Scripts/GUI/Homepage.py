@@ -8,7 +8,7 @@ from tkinter import *
 import os
 import sys
 
-from Scripts.GUI.functions import upload_picture
+from Scripts.GUI.functions import upload_picture, prepair_webcam_search
 
 main_bg_colour = '#e1c793'
 main_button_colour = '#ead7b2'
@@ -31,7 +31,7 @@ class Homepage(Frame):
                                           bg=main_button_colour,
                                           image=photo_take,
                                           font=main_font,
-                                          command=lambda: controller.show_frame(PageWebcamSearch))
+                                          command=lambda: prepair_webcam_search(PageWebcamSearch, controller))
         self.take_picture_button.image = photo_take
 
         photo_upload = PhotoImage(file=os.path.join(sys.path[1], 'Images\Afbeelding3.png'))
