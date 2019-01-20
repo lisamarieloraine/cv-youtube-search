@@ -1,4 +1,6 @@
 from tkinter import *
+import pygame
+import pygame.camera
 from Scripts.WebScraping.ModuleYT import search_and_store
 from Scripts.WebScraping.FilterTerms import SortBy, Features, UploadDate, Duration
 import Scripts.ImageRecognition.main as main
@@ -84,6 +86,15 @@ def prepair_webcam_search(frame_data, frame_controller):
 
     print_URL(frame_controller.frames[frame_data].input_searchterm, frame_controller.frames[frame_data].show_thumbnails)
     return frame_controller.show_frame(frame_data)
+
+
+def prepair_file_browser(frame_data, frame_controller):
+    pygame.camera.init()
+    cam = pygame.camera.Camera(0, (640, 480))
+    cam.start()
+    img = cam.get_image()
+    pygame.image.save(img, "filename.jpg")
+    return upload_picture()
 
 
 def upload_picture():

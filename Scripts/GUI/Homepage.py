@@ -8,7 +8,7 @@ from tkinter import *
 import os
 import sys
 
-from Scripts.GUI.functions import upload_picture, prepair_webcam_search
+from Scripts.GUI.functions import prepair_webcam_search, prepair_file_browser
 
 main_bg_colour = '#e1c793'
 main_button_colour = '#ead7b2'
@@ -39,7 +39,7 @@ class Homepage(Frame):
                                             bg=main_button_colour,
                                             font=main_font,
                                             image=photo_upload,
-                                            command=lambda: upload_picture())
+                                            command=lambda: prepair_file_browser(None, None))
         self.upload_picture_button.image = photo_upload
 
         photo_search = PhotoImage(file=os.path.join(sys.path[0], 'Images\search.png'))
