@@ -94,6 +94,6 @@ class GUI(Tk):
     #     screen_take.pack()  # Pack option to see it
     #
     #     show_frame()
-
-gui=GUI()
-gui.mainloop()
+#
+# gui=GUI()
+# gui.mainloop()
