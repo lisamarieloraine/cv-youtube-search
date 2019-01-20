@@ -76,10 +76,11 @@ def prepair_webcam_search(frame_data, frame_controller):
         frame_data.input_searchterm = SEARCHPICTURE_DICT[SEARCHPICTURE]
     else:
         new_search_term = main.run(write = False, predict = True, image = SEARCHPICTURE)
+        print('CNN conclusion: {}'.format(new_search_term))
         frame_controller.frames[frame_data].input_searchterm = new_search_term
+        frame_controller.frames[frame_data].search_term_label.config(text=new_search_term)
         SEARCHPICTURE_DICT[SEARCHPICTURE] = new_search_term
 
-    print(frame_controller.frames[frame_data].input_searchterm)
     print_URL(frame_controller.frames[frame_data].input_searchterm, frame_controller.frames[frame_data].show_thumbnails)
     return frame_controller.show_frame(frame_data)
 
