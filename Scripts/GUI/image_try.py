@@ -12,7 +12,7 @@ def open_web():
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
     webcam_win = Toplevel(root)
-    Toplevel.bind('<Escape>', lambda e: webcam_win.quit())
+    # Toplevel.bind('<Escape>', lambda e: webcam_win.quit())
     lmain = Label(webcam_win)
     lmain.pack()
 
@@ -33,10 +33,7 @@ def open_web():
         lmain.imgtk = imgtk
         lmain.configure(image=imgtk)
         lmain.after(10, show_frame)
-        global takePicture
-        if takePicture == 1:  # My option for take the image
-            img.save("test.png")  # Save the instant image
-            takePicture = takePicture - 1  # Remove "1" to the variable
+        img.save("test.png")  # Save the instant image
 
     screenTake = Button(webcam_win, text='ScreenShot', command=TakePictureC)  # The button for take picture
     screenTake.pack()  # Pack option to see it

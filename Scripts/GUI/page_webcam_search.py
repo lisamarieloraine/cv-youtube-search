@@ -111,6 +111,15 @@ class PageWebcamSearch(Frame):
                                      command=lambda: controller.show_frame(Scripts.GUI.Homepage.Homepage))
         self.go_back_button.image = photo_go_back
 
+        photo_search_small = PhotoImage(file=os.path.join(sys.path[0], 'Images\search_small.png'))
+        self.search_button = Button(self,
+                                    height=25,
+                                    width=25,
+                                    bg=main_button_colour,
+                                    image=photo_search_small,
+                                    command=lambda: funcs.print_URL(self.input_searchterm.get(), self.show_thumbnails))
+        self.search_button.image = photo_search_small
+
         self.result_label = Label(self,
                                   text='Results',
                                   font=(main_font, 25),
@@ -175,6 +184,8 @@ class PageWebcamSearch(Frame):
         self.search_button.place(x=50,
                                  y=360)
 
+        self.search_button.place(x=250,
+                                 y=80)
 
 
     def show_thumbnails(self, _link_list):

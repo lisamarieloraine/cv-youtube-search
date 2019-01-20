@@ -1,6 +1,5 @@
 from tkinter import *
-import pygame
-import pygame.camera
+import cv2
 from Scripts.WebScraping.ModuleYT import search_and_store
 from Scripts.WebScraping.FilterTerms import SortBy, Features, UploadDate, Duration
 import Scripts.ImageRecognition.main as main
@@ -64,8 +63,8 @@ DURATION_DICT = {
 #         img.save("test.png")  # Save the instant image
 #         takePicture = takePicture - 1  # Remove "1" to the variable
 
-def prepair_webcam_search(frame_data, frame_controller):
-    """Opens up webcam search page while checking if globally selected picture is available
+def prepair_browser_search(frame_data, frame_controller):
+    """Opens up search page while checking if globally selected picture is available
     Otherwise, open file browser. Then throw picture through CNN and provide a search term"""
     global SEARCHPICTURE, SEARCHPICTURE_DICT
     if SEARCHPICTURE is None:
@@ -88,13 +87,27 @@ def prepair_webcam_search(frame_data, frame_controller):
     return frame_controller.show_frame(frame_data)
 
 
-def prepair_file_browser(frame_data, frame_controller):
-    pygame.camera.init()
-    cam = pygame.camera.Camera(0, (640, 480))
-    cam.start()
-    img = cam.get_image()
-    pygame.image.save(img, "filename.jpg")
-    return upload_picture()
+def prepair_webcam_search(frame_data, frame_controller):
+    """Opens up webcam search page while checking if globally selected picture is available
+        Otherwise, open webcam. Then throw picture through CNN and provide a search term"""
+    cap = cv2.VideoCapture(0)
+
+    while (True):
+        # Capture frame-by-frame
+        ret, frame = cap.read()
+
+        # Our operations on the frame come here
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        # Display the resulting frame
+        cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
+        cv2.imshow('frame', gray)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # When everything done, release the capture
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 def upload_picture():
