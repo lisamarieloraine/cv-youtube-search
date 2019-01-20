@@ -24,8 +24,7 @@ class Homepage(Frame):
         self.config(background=main_bg_colour)
 
         # Create Buttons
-
-        photo_take = PhotoImage(file='camera.png')
+        photo_take = PhotoImage(file=os.path.join(sys.path[0], 'Images\camera.png'))
         self.take_picture_button = Button(self,
                                           text='Take picture',
                                           bg=main_button_colour,
@@ -34,7 +33,7 @@ class Homepage(Frame):
                                           command=lambda: prepair_webcam_search(PageWebcamSearch, controller))
         self.take_picture_button.image = photo_take
 
-        photo_upload = PhotoImage(file=os.path.join(sys.path[1], 'Images\Afbeelding3.png'))
+        photo_upload = PhotoImage(file=os.path.join(sys.path[0], 'Images\Afbeelding3.png'))
         self.upload_picture_button = Button(self,
                                             text='Upload picture',
                                             bg=main_button_colour,
@@ -43,7 +42,7 @@ class Homepage(Frame):
                                             command=lambda: upload_picture())
         self.upload_picture_button.image = photo_upload
 
-        photo_search = PhotoImage(file=os.path.join(sys.path[1], 'Images\search.png'))
+        photo_search = PhotoImage(file=os.path.join(sys.path[0], 'Images\search.png'))
         self.self_search_button = Button(self,
                                          text='Search',
                                          font=main_font,
