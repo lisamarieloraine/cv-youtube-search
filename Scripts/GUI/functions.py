@@ -67,7 +67,8 @@ def prepair_webcam_search(frame_data, frame_controller):
     Otherwise, open file browser. Then throw picture through CNN and provide a search term"""
     global SEARCHPICTURE, SEARCHPICTURE_DICT
     if SEARCHPICTURE is None:
-        upload_picture()
+        upload_picture()  # Open file browser
+        # Open Screen capture device
         # Possibility to upload picture and denied
         if SEARCHPICTURE is None:
             return None
@@ -78,7 +79,7 @@ def prepair_webcam_search(frame_data, frame_controller):
         new_search_term = main.run(write = False, predict = True, image = SEARCHPICTURE)
         print('CNN conclusion: {}'.format(new_search_term))
         frame_controller.frames[frame_data].input_searchterm = new_search_term
-        frame_controller.frames[frame_data].search_term_label.config(text=new_search_term)
+        frame_controller.frames[frame_data].search_term_label.config(text='CNN: {}'.format(new_search_term))
         SEARCHPICTURE_DICT[SEARCHPICTURE] = new_search_term
 
     print_URL(frame_controller.frames[frame_data].input_searchterm, frame_controller.frames[frame_data].show_thumbnails)
