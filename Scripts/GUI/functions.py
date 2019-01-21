@@ -75,14 +75,14 @@ def prepair_browser_search(frame_data, frame_controller):
         if SEARCHPICTURE is None:
             return None
 
-    if SEARCHPICTURE in SEARCHPICTURE_DICT:
-        frame_data.input_searchterm = SEARCHPICTURE_DICT[SEARCHPICTURE]
-    else:
-        new_search_term = main.run(write = False, predict = True, image = SEARCHPICTURE)
-        print('CNN conclusion: {}'.format(new_search_term))
-        frame_controller.frames[frame_data].input_searchterm = new_search_term
-        frame_controller.frames[frame_data].search_term_label.config(text='CNN: {}'.format(new_search_term))
-        SEARCHPICTURE_DICT[SEARCHPICTURE] = new_search_term
+    # if SEARCHPICTURE in SEARCHPICTURE_DICT:
+    #     frame_data.input_searchterm = SEARCHPICTURE_DICT[SEARCHPICTURE]
+    # else:
+    new_search_term = main.run(write = False, predict = True, image = SEARCHPICTURE)
+    print('CNN conclusion: {}'.format(new_search_term))
+    frame_controller.frames[frame_data].input_searchterm = new_search_term
+    frame_controller.frames[frame_data].search_term_label.config(text='CNN: {}'.format(new_search_term))
+    SEARCHPICTURE_DICT[SEARCHPICTURE] = new_search_term
 
     print_URL(frame_controller.frames[frame_data].input_searchterm, frame_controller.frames[frame_data].show_thumbnails)
     return frame_controller.show_frame(frame_data)
@@ -99,8 +99,11 @@ def prepair_webcam_search(frame_data, frame_controller):
 
     while True:
         ret, frame = cam.read()
+        cv2.putText(frame, '[Space] - Screenshot', (10, 30), font, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(frame, '[Esc] - Exit', (10, 70), font, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
+        sees = '... loading'  # main.run(write = False, predict = True, image = frame)
+        cv2.putText(frame, 'CNN prediction: {}'.format(sees), (10, 110), font, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.imshow("test", frame)
-        cv2.putText(frame, '[Space] Screenshot', (10, 10), font, 40, (255, 255, 255), 20, cv2.LINE_AA)
         if not ret:
             break
         k = cv2.waitKey(1)
