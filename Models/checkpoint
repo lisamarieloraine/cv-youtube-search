@@ -1,2 +1,2 @@
-model_checkpoint_path: "C:\\Users\\plagl\\youtubeproject\\models\\cnn-version-0"
-all_model_checkpoint_paths: "C:\\Users\\plagl\\youtubeproject\\models\\cnn-version-0"
+model_checkpoint_path: "C:\\youtubeproject\\Models\\cnn-version-0"
+all_model_checkpoint_paths: "C:\\youtubeproject\\Models\\cnn-version-0"

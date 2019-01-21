@@ -39,10 +39,11 @@ def run(write=False, predict=False, image=""):
 
         # validation set contains only few examples that are prominent enough
         # thats why we split the train set into a new train set and a validation set
-        data_shuffle = data_train
+        data_shuffle = data_train   
+        validation = int(len(data_shuffle)/8) 
         random.shuffle(data_shuffle)
-        data_val = data_shuffle[0:150]
-        data_train = data_shuffle[150:]
+        data_val = data_shuffle[:validation]
+        data_train = data_shuffle[validation:]
         img_path_val = img_path_train
     else:
         ann_path, img_path_train, img_path_val = "", "", ""
@@ -56,7 +57,7 @@ def run(write=False, predict=False, image=""):
 
     network = net.CNN(training_iters, learning_rate, batch_size, n_pixels, \
                       n_classes, img_path_train, img_path_val)
-
+    script_path = os.getcwd()
     # Either train the network or use a pretrained network for predicting
     if predict == False:
         # Create datasets for training and validation
@@ -72,9 +73,16 @@ def run(write=False, predict=False, image=""):
     else:
         # Make a prediction for a given image
         result = network.predict(image)
-        label = np.argmax(result)
-        key = klasses[label][0]
-        os.chdir(sys.path[0])
+        if result[0][0] > 0.5 and result[0][1] < -0.5 and result[0][1] > -2.4:
+            key = "banana"
+        elif result[0][0] < -0.5 and result[0][1] > -0.5  :
+            key = "broccoli"
+        else:
+            key = "object not supported"
+        
+        #label = np.argmax(result)
+        #key = klasses[label][0]
+        os.chdir( script_path)
         return key
 
 # "D:\\cocoapi\\images\\test2017\\000000006610.jpg" broccoli
