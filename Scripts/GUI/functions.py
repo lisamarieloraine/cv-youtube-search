@@ -1,5 +1,6 @@
 from tkinter import *
 import cv2
+import os
 from Scripts.WebScraping.ModuleYT import search_and_store
 from Scripts.WebScraping.FilterTerms import SortBy, Features, UploadDate, Duration
 import Scripts.ImageRecognition.main as main
@@ -87,27 +88,47 @@ def prepair_browser_search(frame_data, frame_controller):
     return frame_controller.show_frame(frame_data)
 
 
+# @return FileLocation if image has been made else None
 def prepair_webcam_search(frame_data, frame_controller):
     """Opens up webcam search page while checking if globally selected picture is available
         Otherwise, open webcam. Then throw picture through CNN and provide a search term"""
-    cap = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture(0)
+    cv2.namedWindow("test")
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    location = None
 
-    while (True):
-        # Capture frame-by-frame
-        ret, frame = cap.read()
+    while True:
+        ret, frame = cam.read()
+        cv2.imshow("test", frame)
+        cv2.putText(frame, '[Space] Screenshot', (10, 10), font, 40, (255, 255, 255), 20, cv2.LINE_AA)
+        if not ret:
+            break
+        k = cv2.waitKey(1)
 
-        # Our operations on the frame come here
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-        # Display the resulting frame
-        cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
-        cv2.imshow('frame', gray)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if k % 256 == 27:
+            # ESC pressed
+            print("Escape hit, closing...")
+            break
+        elif k % 256 == 32:
+            # SPACE pressed
+            img_name = "opencv_frame_0.jpg"
+            location = os.path.join(sys.path[0], img_name)
+            cv2.imwrite(location, frame)
+            print("{} written! at {}".format(img_name, location))
             break
 
-    # When everything done, release the capture
-    cap.release()
+    cam.release()
     cv2.destroyAllWindows()
+
+    if location is not None:
+        print('Screenshot will be processed, opening search page')
+        # Startup search page
+        global SEARCHPICTURE
+        SEARCHPICTURE = location
+        prepair_browser_search(frame_data, frame_controller)
+    else:
+        print('No screenshot taken, back to main menu')
+
 
 
 def upload_picture():

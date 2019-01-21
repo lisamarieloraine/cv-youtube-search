@@ -30,7 +30,7 @@ class Homepage(Frame):
                                           bg=main_button_colour,
                                           image=photo_take,
                                           font=main_font,
-                                          command=lambda: prepair_webcam_search(None, None))
+                                          command=lambda: prepair_webcam_search(PageWebcamSearch, controller))
         self.take_picture_button.image = photo_take
 
         photo_upload = PhotoImage(file=os.path.join(sys.path[0], 'Images\Afbeelding3.png'))

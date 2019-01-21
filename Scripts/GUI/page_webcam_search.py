@@ -125,7 +125,7 @@ class PageWebcamSearch(Frame):
                                   font=(main_font, 25),
                                   bg=main_bg_colour)
 
-        self.search_button = Button(self, text="Search",
+        self.search_button = Button(self, text="Re-search",
                                     height=1,
                                     width=8,
                                     bg=main_button_colour,
