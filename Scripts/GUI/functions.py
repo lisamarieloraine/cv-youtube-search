@@ -72,20 +72,7 @@ def prepair_browser_search(frame_data, frame_controller):
     upload_picture()  # Open file browser
     # Open Screen capture device
     # Possibility to upload picture and denied
-    if SEARCHPICTURE is None:
-        return None
-
-    # if SEARCHPICTURE in SEARCHPICTURE_DICT:
-    #     frame_data.input_searchterm = SEARCHPICTURE_DICT[SEARCHPICTURE]
-    # else:
-    new_search_term = main.run(write = False, predict = True, image = SEARCHPICTURE)
-    print('CNN conclusion: {}'.format(new_search_term))
-    frame_controller.frames[frame_data].input_searchterm = new_search_term
-    frame_controller.frames[frame_data].search_term_label.config(text='CNN: {}'.format(new_search_term))
-    SEARCHPICTURE_DICT[SEARCHPICTURE] = new_search_term
-
-    print_URL(frame_controller.frames[frame_data].input_searchterm, frame_controller.frames[frame_data].show_thumbnails)
-    return frame_controller.show_frame(frame_data)
+    return open_search_page(frame_data, frame_controller)
 
 
 # @return FileLocation if image has been made else None
@@ -133,18 +120,23 @@ def prepair_webcam_search(frame_data, frame_controller):
         print('No screenshot taken, back to main menu')
     
     # Ugly copy
+    return open_search_page(frame_data, frame_controller)
+
+
+def open_search_page(frame_data, frame_controller):
     if SEARCHPICTURE is None:
         return None
-    
-    new_search_term = main.run(write = False, predict = True, image = SEARCHPICTURE)
+    # if SEARCHPICTURE in SEARCHPICTURE_DICT:
+    #     frame_data.input_searchterm = SEARCHPICTURE_DICT[SEARCHPICTURE]
+    # else:
+    new_search_term = main.run(write=False, predict=True, image=SEARCHPICTURE)
     print('CNN conclusion: {}'.format(new_search_term))
     frame_controller.frames[frame_data].input_searchterm = new_search_term
     frame_controller.frames[frame_data].search_term_label.config(text='CNN: {}'.format(new_search_term))
     SEARCHPICTURE_DICT[SEARCHPICTURE] = new_search_term
-
     print_URL(frame_controller.frames[frame_data].input_searchterm, frame_controller.frames[frame_data].show_thumbnails)
-    return frame_controller.show_frame(frame_data)
 
+    return frame_controller.show_frame(frame_data)
 
 
 def upload_picture():
@@ -160,50 +152,19 @@ def upload_picture():
 def close_win():
     root.destroy()
 
+
 def close_window():
     close_que = messagebox.askquestion('Exit', 'Are you sure you want to exit?')
     if close_que == 'yes':
         close_win()
 
 
-
-# # Dropdown menu
-#
-# menu = Menu(root)
-# root.config(menu=menu)
-#
-# picture_menu = Menu(menu)
-# menu.add_cascade(label='Picture',
-#                  menu =  picture_menu)
-#
-# picture_menu.add_command(label = 'Camera')
-#
-# picture_menu.add_command(label = 'From gallery')
-#
-# settings = Menu(menu)
-# menu.add_command(label='Settings')
-#
-# exit = Menu(menu)
-# menu.add_command(label = 'Exit',command =  close_window)
-#
-
-# def show_result_window():
-# #     #         clear_window()
-# #     #         result_window()
-# #     #
-# #     #
-# #     #
-
-# #     #
-# #     #     def make_pic():
-# #     #         pass
-
-
 def print_URL(string, show_entry_func):
-    print('Search')
-    list = search_and_store(string, 'unused', SORTBY, UPLOADDATE, DURATION, FEATURES)
-    print(list)
-    show_entry_func(list)
+    if string == 'object not supported':
+        list_links = ['https://www.youtube.com/watch?v=dQw4w9WgXcQ']
+    else:
+        list_links = search_and_store(string, 'unused', SORTBY, UPLOADDATE, DURATION, FEATURES)
+    show_entry_func(list_links)
 
 
 # Description: Sets the global variable SORTBY everytime the combobox is updated
