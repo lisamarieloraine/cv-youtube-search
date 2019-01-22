@@ -12,5 +12,5 @@ The evaluation document of our project can be found in the root of this reposito
 and is called `evaluation-group01.pdf`. Moreover, the extensive project report is called
 `report-group01.pdf`.
 
-*Disclaimer:* This is the actual repository of our project. 
+_Disclaimer:_ This is the actual repository of our project. 
 Please disregard the other repository of our group!
