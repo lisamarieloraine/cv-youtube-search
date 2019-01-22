@@ -1,5 +1,3 @@
-import webbrowser
-
 from Scripts.WebScraping.VerifyRequest import get_verified_response
 from Scripts.WebScraping.FilterTerms import SortBy, UploadDate, Features, Duration
 from Scripts.WebScraping.PullThumbnail import get_thumbnail
@@ -15,6 +13,8 @@ def filter_watch_only(_list):
     result = list()
     pattern = compile('^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/watch.+$')
     for href in _list:
+        if href == 'https://www.youtube.com/watch?v=4wb1RfnnqdY':  # Hard code remove naked cooking
+            continue
         if type(href) is str and pattern.match(href):
             result.append(href)
     return result
@@ -39,6 +39,7 @@ def import_youtube_data(_youtube_url):
     """Returns list of urls from url response"""
     result = list()
     response = get_verified_response(_youtube_url)  # Get server response from url request
+    print(response.data)
     if response is None:
         return result
     soup = BeautifulSoup(response.data, 'html.parser')
@@ -54,8 +55,7 @@ def import_youtube_data(_youtube_url):
 # @argument <class 'Enum'>, ...
 # @return <class 'string'>
 def filter_search_string(_search_term, _filter=list()):
-    # TODO: '+recipe' For a forced recipe video
-    result = '{} +recipe'.format(_search_term)
+    result = '{} +recipe'.format(_search_term)  # tutorial
     for term in _filter:
         if term != '':
             result += ', {}'.format(term)

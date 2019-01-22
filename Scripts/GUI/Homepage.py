@@ -51,8 +51,8 @@ class Homepage(Frame):
                                          command=lambda: controller.show_frame(PageSearch))
         self.self_search_button.image = photo_search
 
-        self.webcame_test_button = Button(self,
-                                          text='test')
+        # self.webcame_test_button = Button(self,
+        #                                   text='test')
 
         # Button placements
         self.take_picture_button.place(x=200,
@@ -72,8 +72,8 @@ class Homepage(Frame):
                                       anchor='center',
                                       width=120,
                                       height=120)
-        self.webcame_test_button.place(x=10,
-                                       y=10)
+        # self.webcame_test_button.place(x=10,
+        #                                y=10)
 
 
 # Import pictures
