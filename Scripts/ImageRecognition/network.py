@@ -9,8 +9,6 @@ Created on Wed Dec 12 14:47:15 2018
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import os
-import sys
-#os.environ["CUDA_VISIBLE_DEVICES"]="0" #for training on gpu
 
 
 class CNN:
@@ -27,40 +25,23 @@ class CNN:
         self.weights = {
         'wc1_1': tf.get_variable('w1_1', shape=(3,3,3,16), initializer=tf.contrib.layers.xavier_initializer()), 
         'wc1_2' :tf.get_variable('w1_2', shape=(3,3,16,16), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc1_3' :tf.get_variable('w1_3', shape=(3,3,16,32), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc1_4' :tf.get_variable('w1_4', shape=(3,3,32,32), initializer=tf.contrib.layers.xavier_initializer()), 
         
         'wc2_1': tf.get_variable('w2_1', shape=(3,3,16,32), initializer=tf.contrib.layers.xavier_initializer()), 
         'wc2_2': tf.get_variable('w2_2', shape=(3,3,32,32), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wc2_3': tf.get_variable('w2_3', shape=(3,3,32,32), initializer=tf.contrib.layers.xavier_initializer()),
-        
-        'wc3_1': tf.get_variable('w3_1', shape=(3,3,32,64), initializer=tf.contrib.layers.xavier_initializer()),
-        'wc3_2': tf.get_variable('w3_2', shape=(3,3,64,64), initializer=tf.contrib.layers.xavier_initializer()),
-        
-        'wc4_1': tf.get_variable('w4_1', shape=(3,3,64,128), initializer=tf.contrib.layers.xavier_initializer()),
         
         'wd1_1': tf.get_variable('wd1_1', shape=(13*13*32,32), initializer=tf.contrib.layers.xavier_initializer()), 
-        'wd1_2': tf.get_variable('wd1_2', shape=(32,16), initializer=tf.contrib.layers.xavier_initializer()), 
         
         'out': tf.get_variable('w6', shape=(32,n_classes), initializer=tf.contrib.layers.xavier_initializer()), 
         }
+        
         self.biases = {
             'bc1_1': tf.get_variable('b1_1', shape=(16), initializer=tf.contrib.layers.xavier_initializer()),
             'bc1_2': tf.get_variable('b1_2', shape=(16), initializer=tf.contrib.layers.xavier_initializer()),
-            #'bc1_3': tf.get_variable('b1_3', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
-            #'bc1_4': tf.get_variable('b1_4', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
-            
             
             'bc2_1': tf.get_variable('b2_1', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
             'bc2_2': tf.get_variable('b2_2', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
             
-            'bc3_1': tf.get_variable('b3_1', shape=(64), initializer=tf.contrib.layers.xavier_initializer()),
-            'bc3_2': tf.get_variable('b3_2', shape=(64), initializer=tf.contrib.layers.xavier_initializer()),
-            
-            'bc4_1': tf.get_variable('b4_1', shape=(128), initializer=tf.contrib.layers.xavier_initializer()),
-            
             'bd1_1': tf.get_variable('bd1_1', shape=(32), initializer=tf.contrib.layers.xavier_initializer()),
-            'bd1_2': tf.get_variable('bd2_2', shape=(16), initializer=tf.contrib.layers.xavier_initializer()),
             
             'out': tf.get_variable('b4', shape=(n_classes), initializer=tf.contrib.layers.xavier_initializer()),
         }
@@ -68,7 +49,6 @@ class CNN:
     
     def conv_net(self, x,train = False):  
 
-      
         conv1 = self.conv2d(x, self.weights['wc1_1'], self.biases['bc1_1'])   #62
         conv1 = self.conv2d(conv1,self.weights['wc1_2'], self.biases['bc1_2'])   #60
         conv1 = self.maxpool2d(conv1,k=2) #30
@@ -76,37 +56,16 @@ class CNN:
         conv2 = self.conv2d(conv1,self.weights['wc2_1'], self.biases['bc2_1']) ##28
         conv2 = self.conv2d(conv2,self.weights['wc2_2'], self.biases['bc2_2']) ##26
         conv2 = self.maxpool2d(conv2,k=2) #13
- 
-        
-        #conv3 = self.conv2d(conv2, self.weights['wc3_1'], self.biases['bc3_1']) #12
-        #conv3 = self.maxpool2d(conv3, k=2) #6
-        
-        #conv4 = self.conv2d(conv3, self.weights['wc4_1'], self.biases['bc4_1']) #4
-        #conv4 = self.maxpool2d(conv4, k=2) #2
-        
-        #conv2 = self.conv2d(conv2, self.weights['wc2_3'], self.biases['bc2_3']) #24  #56
-        #conv2 = self.conv2d(conv2, self.weights['wc2_4'], self.biases['bc2_4'])
-        #conv2 = self.maxpool2d(conv2, k=2) #13
-        #conv2 = tf.layers.dropout(conv2,rate=0.05)
-        
-        #conv3 = self.conv2d(conv2,self.weights['wc3_1'],self.biases['bc3_1']) #11 
-        #conv3 = self.conv2d(conv3,self.weights['wc3_2'],self.biases['bc3_2']) #9
-        #conv3 = self.maxpool2d(conv3, k=2) #5
+
         
         # Fully connected layer
         # Reshape conv2 output to fit fully connected layer input
         fc1 = tf.reshape(conv2, [-1, self.weights['wd1_1'].get_shape().as_list()[0]])
         fc1 = tf.add(tf.matmul(fc1, self.weights['wd1_1']), self.biases['bd1_1'])
         fc1 = tf.nn.relu(fc1)
-        
+        # add dropout layer to reduce overfitting
         fc1 = tf.layers.dropout(fc1,rate = 0.7,training = train)
         
-# =============================================================================
-#         fc2 = tf.reshape(fc1, [-1, self.weights['wd1_2'].get_shape().as_list()[0]])
-#         fc2 = tf.add(tf.matmul(fc2, self.weights['wd1_2']), self.biases['bd1_2'])
-#         fc2 = tf.nn.relu(fc2)
-#         fc2 = tf.layers.dropout(fc2,rate = 0.3,training = train)
-# =============================================================================
         # Output, class prediction
         # finally we multiply the fully connected layer with the weights and add a bias term. 
         out = tf.add(tf.matmul(fc1, self.weights['out']), self.biases['out'])

@@ -68,12 +68,12 @@ def prepair_browser_search(frame_data, frame_controller):
     """Opens up search page while checking if globally selected picture is available
     Otherwise, open file browser. Then throw picture through CNN and provide a search term"""
     global SEARCHPICTURE, SEARCHPICTURE_DICT
+    # if SEARCHPICTURE is None:
+    upload_picture()  # Open file browser
+    # Open Screen capture device
+    # Possibility to upload picture and denied
     if SEARCHPICTURE is None:
-        upload_picture()  # Open file browser
-        # Open Screen capture device
-        # Possibility to upload picture and denied
-        if SEARCHPICTURE is None:
-            return None
+        return None
 
     # if SEARCHPICTURE in SEARCHPICTURE_DICT:
     #     frame_data.input_searchterm = SEARCHPICTURE_DICT[SEARCHPICTURE]
@@ -128,9 +128,22 @@ def prepair_webcam_search(frame_data, frame_controller):
         # Startup search page
         global SEARCHPICTURE
         SEARCHPICTURE = location
-        prepair_browser_search(frame_data, frame_controller)
+        # prepair_browser_search(frame_data, frame_controller)
     else:
         print('No screenshot taken, back to main menu')
+    
+    # Ugly copy
+    if SEARCHPICTURE is None:
+        return None
+    
+    new_search_term = main.run(write = False, predict = True, image = SEARCHPICTURE)
+    print('CNN conclusion: {}'.format(new_search_term))
+    frame_controller.frames[frame_data].input_searchterm = new_search_term
+    frame_controller.frames[frame_data].search_term_label.config(text='CNN: {}'.format(new_search_term))
+    SEARCHPICTURE_DICT[SEARCHPICTURE] = new_search_term
+
+    print_URL(frame_controller.frames[frame_data].input_searchterm, frame_controller.frames[frame_data].show_thumbnails)
+    return frame_controller.show_frame(frame_data)
 
 
 
