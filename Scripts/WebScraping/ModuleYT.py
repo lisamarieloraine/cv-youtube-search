@@ -26,7 +26,9 @@ def filter_watch_only(_list):
 def filter_thumbnail_only(_list):
     """Returns list of filtered youtube hyper-links"""
     result = list()
-    for href in _list:
+    for count, href in enumerate(_list):
+        if count > 15:
+            break
         if get_verified_response(get_thumbnail(href)).status == 200:
             result.append(href)
     return result
@@ -38,17 +40,21 @@ def filter_thumbnail_only(_list):
 def import_youtube_data(_youtube_url):
     """Returns list of urls from url response"""
     result = list()
-    response = get_verified_response(_youtube_url)  # Get server response from url request
-    print(response.data)
-    if response is None:
-        return result
-    soup = BeautifulSoup(response.data, 'html.parser')
 
-    for vid in soup.findAll('a', attrs={'class': 'yt-uix-tile-link'}):  # Find all <a> tags on page
-        result.append('https://www.youtube.com' + vid['href'])  # Extracting web links using 'href' property
+    for i in range(3):
+        response = get_verified_response(_youtube_url + '&page={}'.format(i))  # Get server response from url request
+        if response is None:
+            continue
+        # print(response.data)
+        soup = BeautifulSoup(response.data, 'html.parser')
+        for vid in soup.findAll('a', attrs={'class': 'yt-uix-tile-link'}):  # Find all <a> tags on page
+            result.append('https://www.youtube.com' + vid['href'])  # Extracting web links using 'href' property
 
+    print('Length before filter: {}'.format(len(result)))
     result = filter_watch_only(result)
-    return filter_thumbnail_only(result)
+    result = filter_thumbnail_only(result)
+    print('Length after filter: {}'.format(len(result)))
+    return result
 
 
 # @Description Concatenates Enum filter values to a valid string
@@ -79,10 +85,10 @@ def search_and_store(_search_term, _filename, _sortby_filter='', _uploadtime_fil
 
 
 if __name__ == '__main__':
-    _list = search_and_store('banana', 'unused', SortBy.ViewCount.value, UploadDate.ThisYear.value, Duration.Short.value, [Features.Subtitles.value])
+    _list = search_and_store('broccoli', 'unused', SortBy.ViewCount.value, UploadDate.Default.value, Duration.Short.value, [])
     print('--- Search function ---')
     for link in _list:
         print('Video: {}'.format(link))
-        print('Thumbnail: {}'.format(get_thumbnail(link)))
+        # print('Thumbnail: {}'.format(get_thumbnail(link)))
         # webbrowser.open(get_thumbnail(link))
     print(len(_list))
