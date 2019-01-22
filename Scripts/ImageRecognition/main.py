@@ -2,17 +2,15 @@
 import random
 import imp
 import Scripts.ImageRecognition.data as data
-
 imp.reload(data)
 import Scripts.ImageRecognition.network as net
-
 imp.reload(net)
 import tensorflow as tf
 import os
 import json
 # import Scripts.ImageRecognition.paths as paths
 import numpy as np
-import sys
+
 
 
 # Entry point to our neural network
@@ -20,11 +18,15 @@ def run(write=False, predict=False, image=""):
     tf.reset_default_graph()
     klasses = [('banana', 0), ('broccoli', 1)]
 
-    # Setting up directories
-    # this is done in a separate module to avoid changing directories with every pull
     if predict == False:
-        ann_path, img_path_train, img_path_val = "", "", ""  # paths.init_paths()
-        # if we want to make a new selection of images
+        # Setting up directories:
+        # This is done in a separate module to avoid changing directories with every pull.
+        # As the paths.py file is not added to the repo, everyone has to create this file 
+        # manually and define the paths where the training and validation images as well
+        # as the annotations are stored on his PC.
+        paths.init_paths()
+        
+        # if write = True, we want to make a new selection of images
         if write:
             # banana and brocolli have a small intersection -> smaller problem
             data_object = data.Data(ann_path, klasses, img_path_train, img_path_val)
@@ -71,7 +73,7 @@ def run(write=False, predict=False, image=""):
         network.plot_accuracy(train_accuracy, val_accuracy)
         return
     else:
-        # Make a prediction for a given image
+        # Make a prediction for a given image, also supporting a third 'None' type
         result = network.predict(image)
         if result[0][0] > 0.5 and result[0][1] < -0.5 and result[0][1] > -2.4:
             key = "banana"
@@ -82,14 +84,7 @@ def run(write=False, predict=False, image=""):
         
         #label = np.argmax(result)
         #key = klasses[label][0]
-        os.chdir( script_path)
+        os.chdir( script_path )
         return key
 
-# "D:\\cocoapi\\images\\test2017\\000000006610.jpg" broccoli
-# "D:\\cocoapi\\images\\test2017\\000000013691.jpg" banana
-# "D:\\cocoapi\\images\\test2017\\000000006054.jpg" banana
-# "D:\\cocoapi\\images\\test2017\\000000007127.jpg" other
-# "D:\\cocoapi\\images\\test2017\\000000014394.jpg" broccoli
-# search_term = run(write = False, predict = True, \
-#                  image = "D:\\cocoapi\\images\\test2017\\000000006054.jpg")
-# print(search_term)
+
