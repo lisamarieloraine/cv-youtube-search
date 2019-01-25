@@ -14,7 +14,7 @@ import numpy as np
 
 
 # Entry point to our neural network
-def run(write=False, predict=False, image=""):
+def run(write=False, predict=True, image=""):
     tf.reset_default_graph()
     klasses = [('banana', 0), ('broccoli', 1)]
 
@@ -89,3 +89,6 @@ def run(write=False, predict=False, image=""):
         return key
 
 
+# to train the network, download the training and validation COCO dataset and 
+# run:
+# run(write=True, predict=False, image="")
