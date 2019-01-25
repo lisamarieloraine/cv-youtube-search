@@ -21,10 +21,10 @@ def run(write=False, predict=False, image=""):
     if predict == False:
         # Setting up directories:
         # This is done in a separate module to avoid changing directories with every pull.
-        # As the paths.py file is not added to the repo, everyone has to create this file 
+        # If the paths.py file is not added to the repo, everyone has to create this file 
         # manually and define the paths where the training and validation images as well
         # as the annotations are stored on his PC.
-        paths.init_paths()
+        ann_path, img_path_train, img_path_val = paths.init_paths()
         
         # if write = True, we want to make a new selection of images
         if write:
@@ -48,6 +48,7 @@ def run(write=False, predict=False, image=""):
         data_train = data_shuffle[validation:]
         img_path_val = img_path_train
     else:
+        # paths not needed for making predictions, only for training
         ann_path, img_path_train, img_path_val = "", "", ""
 
     # Setting up the neural network
