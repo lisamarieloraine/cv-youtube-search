@@ -1,6 +1,10 @@
 # YouTube Project
 
-## Searching YouTube videos using image recognition.
+*Disclaimer: This is the actual repository of our project. 
+Please disregard the other repository of our group!*
+
+
+## Searching YouTube Videos Using Image Recognition
 
 The idea of this project was to make YouTube searches easier and more 
 efficient for its users by adding a tool to search videos based on a picture. 
@@ -12,5 +16,27 @@ The evaluation document of our project can be found in the root of this reposito
 and is called `evaluation-group01.pdf`. Moreover, the extensive project report is called
 `report-group01.pdf`.
 
-*Disclaimer: This is the actual repository of our project. 
-Please disregard the other repository of our group!*
+To make predicitons for existing images, or images taken with your webcam, no
+images or annotations need to be downloaded. Predictions will be made using a
+pretrained convolutional neural network, which is saved under the Models folder
+of this repository. Training and validation images and annotations have to be 
+downloaded and saved to disk only if a new model needs to be trained (e.g. when 
+adding support for more object classes or changing the current network architecture).
+In this case, the directories where the datasets were saved need to be set up via 
+the script `paths.py`, which can be found in the ImageRecognition folder and the
+predict flag should be set to False in `main.py`.
+
+
+
+## Running the Tool
+
+_You must have Python 3.6 installed (not lower or higher!)_
+
+- Install all the dependencies via the command line
+    - `pip install -r requirements.txt`
+
+- Run the tool in the IDE of your choice (tested on Spyder or PyCharm)
+    - `Demo.py`
+
+
+Enjoy!
