@@ -1,2 +1,15 @@
-pytest
-pylint
+bs4
+certifi
+enum
+io
+imp
+json
+matplotlib
+numpy
+opencv
+PIL
+re
+tkinter
+tensorflow
+urllib3
+webbrowser

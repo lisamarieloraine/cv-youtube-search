@@ -1,5 +1,4 @@
 .spyproject/
 __pycache__/
 *.pyc
-paths.py
 opencv_frame_0.jpg

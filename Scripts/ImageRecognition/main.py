@@ -8,7 +8,7 @@ imp.reload(net)
 import tensorflow as tf
 import os
 import json
-# import Scripts.ImageRecognition.paths as paths
+import Scripts.ImageRecognition.paths as paths
 import numpy as np
 
 
