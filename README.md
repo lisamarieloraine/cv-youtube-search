@@ -23,9 +23,9 @@ of this repository. Training and validation images and annotations have to be
 downloaded and saved to disk only if a new model needs to be trained (e.g. when 
 adding support for more object classes or changing the current network architecture).
 In this case, the directories where the datasets were saved need to be set up via 
-the script `paths.py`, which can be found in the ImageRecognition folder and the
-*predict* flag should be set to False in `main.py`. For more details, please read
-the *Implementation* section in our extensive project report.
+the script `paths.py`, which can be found in the *Scripts/ImageRecognition* folder 
+and the *predict* flag should be set to False in `main.py`. For more details, please 
+read the *Implementation* section in our extensive project report.
 
 
 
