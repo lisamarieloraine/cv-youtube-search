@@ -24,7 +24,7 @@ downloaded and saved to disk only if a new model needs to be trained (e.g. when
 adding support for more object classes or changing the current network architecture).
 In this case, the directories where the datasets were saved need to be set up via 
 the script `paths.py`, which can be found in the ImageRecognition folder and the
-predict flag should be set to False in `main.py`.
+*predict* flag should be set to False in `main.py`.
 
 
 
@@ -35,7 +35,7 @@ _You must have Python 3.6 installed (not lower or higher!)_
 - Install all the dependencies via the command line
     - `pip install -r requirements.txt`
 
-- Run the tool in the IDE of your choice (tested on Spyder or PyCharm)
+- Run the tool in the IDE of your choice (tested in Spyder and PyCharm)
     - `Demo.py`
 
 
