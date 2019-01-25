@@ -1,6 +1,7 @@
 from tkinter import *
 import cv2
 import os
+import sys
 from Scripts.WebScraping.ModuleYT import search_and_store
 from Scripts.WebScraping.FilterTerms import SortBy, Features, UploadDate, Duration
 import Scripts.ImageRecognition.main as main
