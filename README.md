@@ -18,7 +18,7 @@ and is called `evaluation-group01.pdf`. Moreover, the extensive project report i
 
 To make predicitons for existing images, or images taken with your webcam, no
 images or annotations need to be downloaded. Predictions will be made using a
-pretrained convolutional neural network, which is saved under the Models folder
+pretrained convolutional neural network, which is saved under the *Models* folder
 of this repository. Training and validation images and annotations have to be 
 downloaded and saved to disk only if a new model needs to be trained (e.g. when 
 adding support for more object classes or changing the current network architecture).
